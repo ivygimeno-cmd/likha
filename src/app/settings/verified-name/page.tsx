@@ -172,7 +172,7 @@ export default async function VerifiedNameSettingsPage() {
             href="/settings"
             className="text-sm font-medium transition hover:text-[#b76449]"
           >
-            ← Settings
+             Settings
           </Link>
         </div>
       </header>

@@ -210,7 +210,7 @@ async function checkSession() {
             >
               {loading
                 ? "Updating..."
-                : "Set new password →"}
+                : "Set new password "}
             </button>
           </form>
         </div>

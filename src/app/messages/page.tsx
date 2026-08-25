@@ -184,7 +184,7 @@ if (
   href="/support/new"
   className="mt-5 inline-flex rounded-xl bg-[#b76449] px-6 py-3 font-semibold text-white transition hover:bg-[#9f503c]"
 >
- Request Account Review →
+ Request Account Review 
 </Link>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -821,7 +821,7 @@ async function acknowledgeWarning(formData: FormData) {
                     href={`/profile/${selectedConversation.other_user_id}`}
                     className="shrink-0 text-sm font-semibold text-[#b76449] hover:text-[#9f503c]"
                   >
-                    View Profile →
+                    View Profile 
                   </Link>
                 </div>
        

@@ -310,7 +310,7 @@ export default async function AdminRefundsPage({
             href="/admin"
             className="text-sm font-semibold transition hover:text-[#b76449]"
           >
-            ← Admin Dashboard
+             Admin Dashboard
           </Link>
         </div>
       </header>
@@ -470,7 +470,7 @@ export default async function AdminRefundsPage({
                     href={`/orders/${selectedRefund.order_id}`}
                     className="inline-flex text-sm font-semibold text-[#b76449]"
                   >
-                    View Order →
+                    View Order 
                   </Link>
                 </div>
 

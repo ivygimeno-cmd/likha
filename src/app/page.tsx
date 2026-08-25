@@ -90,14 +90,14 @@ export default async function Home() {
   href={user ? "/request" : "/login"}
   className="rounded-md bg-[#b76449] px-8 py-4 text-center font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#9f503c]"
 >
-  Magpagawa →
+  Magpagawa 
 </Link>
 
 <Link
   href={user ? "/marketplace" : "/login"}
   className="rounded-md border border-[#173d32] px-8 py-4 text-center font-semibold transition hover:bg-[#173d32] hover:text-white"
 >
-  Maghanap ng Proyekto →
+  Maghanap ng Proyekto 
 </Link>
           </div>
 
@@ -178,7 +178,7 @@ export default async function Home() {
   href="/marketplace"
   className="hidden font-semibold text-[#b76449] sm:block"
 >
-  Tingnan lahat →
+  Tingnan lahat 
 </Link>
           </div>
 
@@ -198,7 +198,7 @@ export default async function Home() {
   href={category.href}
   className="mt-6 inline-block font-semibold text-[#b76449] hover:text-[#9f503c]"
 >
-  Explore →
+  Explore 
 </Link>
               </article>
             ))}

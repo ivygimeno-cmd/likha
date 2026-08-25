@@ -79,7 +79,7 @@ export default async function EmailChangeCompletePage({
                 href="/login"
                 className="mt-7 inline-flex rounded-xl bg-[#173d32] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#245646]"
               >
-                Sign in with new email →
+                Sign in with new email 
               </Link>
             </>
           )}

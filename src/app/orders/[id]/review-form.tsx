@@ -190,7 +190,7 @@ export default function ReviewForm({
         disabled={loading || rating === 0}
         className="mt-5 bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:bg-[#9f503c] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {loading ? "Ipinapadala..." : "Submit Review →"}
+        {loading ? "Ipinapadala..." : "Submit Review "}
       </button>
     </form>
   );

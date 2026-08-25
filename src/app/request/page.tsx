@@ -154,7 +154,7 @@ if (deliveryError) {
             href="/marketplace"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Bumalik sa Marketplace
+             Bumalik sa Marketplace
           </Link>
         </nav>
       </header>
@@ -540,7 +540,7 @@ if (deliveryError) {
   disabled={loading}
   className="w-full rounded-lg bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#9f503c] disabled:cursor-not-allowed disabled:opacity-60"
 >
-  {loading ? "Sine-save ang request..." : "I-post ang Request →"}
+  {loading ? "Sine-save ang request..." : "I-post ang Request "}
 </button>
           </form>
         </section>

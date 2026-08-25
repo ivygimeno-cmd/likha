@@ -30,10 +30,10 @@ export default function AvatarUpload({
   const initial =
     displayName?.trim().charAt(0).toUpperCase() || "L";
 
-  const avatarSize =
-    size === "profile"
-      ? "h-28 w-28 text-5xl"
-      : "h-24 w-24 text-4xl";
+const avatarSize =
+  size === "profile"
+    ? "h-[160px] w-[160px] text-5xl"
+    : "h-24 w-24 text-4xl";
 
   const avatarStyle = preview
     ? {

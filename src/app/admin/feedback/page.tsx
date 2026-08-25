@@ -287,7 +287,7 @@ export default async function AdminFeedbackPage({
             href="/admin"
             className="text-sm font-semibold transition hover:text-[#b76449]"
           >
-            ← Admin Dashboard
+             Admin Dashboard
           </Link>
         </div>
       </header>

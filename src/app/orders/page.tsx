@@ -183,8 +183,8 @@ const refundOrderIds = new Set(
       className="mt-7 inline-block font-semibold text-[#b76449]"
     >
       {activeFilter === "all"
-        ? "Bumalik sa Dashboard →"
-        : "Tingnan lahat ng orders →"}
+        ? "Bumalik sa Dashboard "
+        : "Tingnan lahat ng orders "}
     </Link>
   </section>
         ) : (
@@ -246,7 +246,7 @@ const refundOrderIds = new Set(
     href={`/orders/${order.id}`}
     className="font-semibold text-[#b76449]"
   >
-    Tingnan ang Order →
+    Tingnan ang Order 
   </Link>
 
 
@@ -258,7 +258,7 @@ const refundOrderIds = new Set(
         href={`/orders/${order.id}#refund`}
         className="text-sm font-semibold text-[#173d32]/65 transition hover:text-[#b76449]"
       >
-        Request a Refund →
+        Request a Refund 
       </Link>
     )}
 </div>

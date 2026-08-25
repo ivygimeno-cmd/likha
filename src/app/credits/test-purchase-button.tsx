@@ -82,7 +82,7 @@ export default function TestPurchaseButton({
       >
         {loading
           ? "Ina-add ang test credits..."
-          : `Bumili ng ${credits} Test Credits →`}
+          : `Bumili ng ${credits} Test Credits `}
       </button>
 
       {message && (

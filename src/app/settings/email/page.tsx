@@ -386,7 +386,7 @@ export default async function EmailSettingsPage({
             href="/settings"
             className="text-sm font-medium transition hover:text-[#b76449]"
           >
-            ← Settings
+             Settings
           </Link>
         </div>
       </header>
@@ -518,7 +518,7 @@ export default async function EmailSettingsPage({
                               emailChangeRequest.requested_value
                             }
                           </span>{" "}
-                          and click “Confirm new email →”.
+                          and click “Confirm new email ”.
                           After confirmation, return to this
                           page.
                         </p>

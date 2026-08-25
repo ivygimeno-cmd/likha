@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import NotificationDropdown from "./notification-dropdown";
 import RealtimeNotificationRefresh from "./realtime-notification-refresh";
 import { refresh } from "next/cache";
+import GlobalSearch from "./global-search";
 
 export default async function AuthenticatedNavbar() {
   const supabase = await createClient();
@@ -184,7 +185,7 @@ async function dismissNotification(formData: FormData) {
         >
           LIKHA
         </Link>
-        
+        <GlobalSearch />
 
         <div className="flex items-center gap-2 sm:gap-3">
 
@@ -355,7 +356,7 @@ async function dismissNotification(formData: FormData) {
         href="/notifications"
         className="flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-[#b76449] transition hover:bg-[#b76449]/10"
       >
-        View all notifications →
+        View all notifications 
       </Link>
     </div>
   </div>

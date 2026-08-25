@@ -601,7 +601,7 @@ async function revokeAllUserSessions() {
             href="/admin"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Admin Dashboard
+             Admin Dashboard
           </Link>
         </nav>
       </header>
@@ -1368,7 +1368,7 @@ async function revokeAllUserSessions() {
                       href={`/admin/support/${ticket.ticket_id}`}
                       className="inline-flex rounded-lg border border-[#173d32]/20 px-4 py-2 text-xs font-semibold transition hover:bg-[#173d32] hover:text-white"
                     >
-                      Review →
+                      Review 
                     </Link>
                   </td>
                 </tr>

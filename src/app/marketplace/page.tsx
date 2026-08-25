@@ -186,7 +186,7 @@ if (openRequestsError) {
               href="/request"
               className="w-fit rounded-md bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#9f503c]"
             >
-              May ipapagawa ako →
+              May ipapagawa ako 
             </Link>
           </div>
 
@@ -325,7 +325,7 @@ if (openRequestsError) {
                 href={`/requests/${request.id}`}
                 className="w-fit rounded-lg bg-[#173d32] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#245646]"
               >
-                Tingnan Request →
+                Tingnan Request 
               </Link>
             </article>
           ))}

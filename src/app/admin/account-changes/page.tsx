@@ -367,7 +367,7 @@ redirect("/admin/account-changes");
             href="/admin"
             className="text-sm font-semibold text-[#b76449]"
           >
-            ← Admin Dashboard
+             Admin Dashboard
           </Link>
         </div>
       </header>
@@ -501,7 +501,7 @@ redirect("/admin/account-changes");
                           </span>
 
                           <span className="text-[#173d32]/35 transition-transform group-open:rotate-90">
-                            →
+                            
                           </span>
                         </div>
                       </div>

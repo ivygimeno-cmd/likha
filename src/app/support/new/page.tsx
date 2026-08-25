@@ -101,7 +101,7 @@ export default async function NewSupportTicketPage({
             href="/dashboard"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </nav>
       </header>
@@ -174,7 +174,7 @@ export default async function NewSupportTicketPage({
             type="submit"
             className="mt-7 w-full rounded-xl bg-[#173d32] px-6 py-4 font-semibold text-white transition hover:bg-[#245646]"
           >
-            Submit Ticket →
+            Submit Ticket 
           </button>
         </form>
       </div>

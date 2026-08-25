@@ -174,7 +174,7 @@ try {
             href="/settings"
             className="text-sm font-medium transition hover:text-[#b76449]"
           >
-            ← Settings
+             Settings
           </Link>
         </div>
       </header>
@@ -338,7 +338,7 @@ try {
               >
                 {loading
                   ? "Changing password..."
-                  : "Change password →"}
+                  : "Change password "}
               </button>
             </div>
           </form>

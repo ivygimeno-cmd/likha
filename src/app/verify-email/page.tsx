@@ -159,7 +159,7 @@ function VerifyEmailContent() {
             href="/login"
             className="mt-8 inline-flex rounded-lg bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
           >
-            Mag-sign in →
+            Mag-sign in 
           </Link>
         </section>
       </main>
@@ -282,7 +282,7 @@ function VerifyEmailContent() {
             >
               {loading
                 ? "Vine-verify..."
-                : "I-confirm ang Email →"}
+                : "I-confirm ang Email "}
             </button>
 
             <button
@@ -305,7 +305,7 @@ function VerifyEmailContent() {
             href="/signup"
             className="mt-6 block text-center text-sm font-semibold text-[#b76449]"
           >
-            ← Bumalik sa signup
+             Bumalik sa signup
           </Link>
         </div>
       </section>

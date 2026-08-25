@@ -35,7 +35,7 @@ export default async function SettingsPage() {
             href="/dashboard"
             className="text-sm font-medium transition hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </div>
       </header>
@@ -87,7 +87,7 @@ export default async function SettingsPage() {
                   </p>
                 </div>
 
-                <span>→</span>
+                <span></span>
               </Link>
 
               <Link
@@ -104,7 +104,7 @@ export default async function SettingsPage() {
                   </p>
                 </div>
 
-                <span>→</span>
+                <span></span>
               </Link>
 
               <Link
@@ -121,7 +121,7 @@ export default async function SettingsPage() {
                   </p>
                 </div>
 
-                <span>→</span>
+                <span></span>
               </Link>
             </div>
           </section>
@@ -155,7 +155,7 @@ export default async function SettingsPage() {
                   </p>
                 </div>
 
-                <span>→</span>
+                <span></span>
               </Link>
             </div>
           </section>
@@ -189,7 +189,7 @@ export default async function SettingsPage() {
                   </p>
                 </div>
 
-                <span>→</span>
+                <span></span>
               </Link>
             </div>
           </section>
@@ -223,7 +223,7 @@ export default async function SettingsPage() {
       </p>
     </div>
 
-    <span>→</span>
+    <span></span>
   </Link>
 
   <div className="py-5">
@@ -231,7 +231,7 @@ export default async function SettingsPage() {
       href="/logout"
       className="inline-flex text-sm font-medium text-[#b76449] transition hover:opacity-70"
     >
-      Mag-sign out sa device na ito →
+      Mag-sign out sa device na ito 
     </Link>
   </div>
 </div>

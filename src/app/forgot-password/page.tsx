@@ -109,7 +109,7 @@ export default function ForgotPasswordPage() {
             >
               {loading
                 ? "Sending..."
-                : "Send password reset link →"}
+                : "Send password reset link "}
             </button>
           </form>
 
@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
             href="/login"
             className="mt-6 block text-center text-sm font-semibold text-[#b76449]"
           >
-            ← Bumalik sa sign in
+             Bumalik sa sign in
           </Link>
         </div>
       </div>

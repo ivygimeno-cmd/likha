@@ -55,7 +55,7 @@ export default function MessageComposer({
           type="submit"
           className="h-[52px] rounded-full bg-[#b76449] px-7 font-semibold text-white transition hover:bg-[#9f503c]"
         >
-          Send →
+          Send 
         </button>
       </div>
 

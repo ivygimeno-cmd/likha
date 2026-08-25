@@ -174,7 +174,7 @@ className="mt-2 inline-block text-xs font-medium text-blue-600 underline underli
               disabled={loading}
               className="w-full rounded-lg bg-[#b76449] px-6 py-4 font-semibold text-white transition hover:bg-[#9f503c] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? "Nagsa-sign in..." : "Mag-sign in →"}
+              {loading ? "Nagsa-sign in..." : "Mag-sign in "}
             </button>
           </form>
 <div className="mt-10 space-y-3 text-center">

@@ -68,7 +68,7 @@ export default async function SupportTicketPage({
             href="/dashboard"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </nav>
       </header>

@@ -54,7 +54,7 @@ const accountFaqs = [
   {
     question: "Paano ko papalitan ang aking email address?",
     answer:
-      "Pumunta sa Mga Setting → Email address. Ilagay ang bago mong email at sundin ang confirmation na ipapadala ng LIKHA sa bagong email address.",
+      "Pumunta sa Mga Setting  Email address. Ilagay ang bago mong email at sundin ang confirmation na ipapadala ng LIKHA sa bagong email address.",
   },
   {
     question:
@@ -65,7 +65,7 @@ const accountFaqs = [
   {
     question: "Paano ko papalitan ang aking password?",
     answer:
-      "Pumunta sa Mga Setting → Password at seguridad → Palitan ang password.",
+      "Pumunta sa Mga Setting  Password at seguridad  Palitan ang password.",
   },
   {
     question:
@@ -77,18 +77,18 @@ const accountFaqs = [
     question:
       "Paano ko babaguhin ang contact number o address ko?",
     answer:
-      "Pumunta sa Mga Setting → Personal na impormasyon upang i-update ang iyong address o contact number.",
+      "Pumunta sa Mga Setting  Personal na impormasyon upang i-update ang iyong address o contact number.",
   },
   {
     question:
       "Paano ko babaguhin ang verified na pangalan ko?",
     answer:
-      "Pumunta sa Mga Setting → Verified na pangalan at mag-request ng pagbabago. Maaaring kailanganin muna itong i-review bago ma-update.",
+      "Pumunta sa Mga Setting  Verified na pangalan at mag-request ng pagbabago. Maaaring kailanganin muna itong i-review bago ma-update.",
   },
   {
     question: "May device o login na hindi ko kilala.",
     answer:
-      "Pumunta agad sa Mga Setting → Pamahalaan ang sessions. Suriin ang mga naka-sign in na device, gamitin ang Sign out all devices kung kinakailangan, at palitan agad ang iyong password.",
+      "Pumunta agad sa Mga Setting  Pamahalaan ang sessions. Suriin ang mga naka-sign in na device, gamitin ang Sign out all devices kung kinakailangan, at palitan agad ang iyong password.",
   },
   {
     question: "Bakit ako biglang na-sign out?",
@@ -226,7 +226,7 @@ const safetyFaqs = [
     question:
       "May device o login na hindi ko kilala. Ano ang gagawin ko?",
     answer:
-      "Pumunta agad sa Mga Setting → Pamahalaan ang sessions. Suriin ang mga naka-sign in na device, gamitin ang Sign out all devices, at palitan agad ang iyong password.",
+      "Pumunta agad sa Mga Setting  Pamahalaan ang sessions. Suriin ang mga naka-sign in na device, gamitin ang Sign out all devices, at palitan agad ang iyong password.",
   },
   {
     question:
@@ -529,7 +529,7 @@ export default async function HelpPage({
             href="/dashboard"
             className="text-sm font-medium transition hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </div>
       </header>
@@ -668,7 +668,7 @@ export default async function HelpPage({
                   href="/help"
                   className="text-xs font-semibold text-[#b76449] transition hover:opacity-70"
                 >
-                  ← Bumalik sa lahat ng paksa
+                   Bumalik sa lahat ng paksa
                 </Link>
 
                 <p className="mt-7 text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
@@ -708,7 +708,7 @@ export default async function HelpPage({
                   href="/help"
                   className="text-xs font-semibold text-[#b76449] transition hover:opacity-70"
                 >
-                  ← Bumalik sa lahat ng paksa
+                   Bumalik sa lahat ng paksa
                 </Link>
 
                 <p className="mt-7 text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
@@ -940,7 +940,7 @@ function FaqSection({
         href="/help"
         className="text-xs font-semibold text-[#b76449] transition hover:opacity-70"
       >
-        ← Bumalik sa lahat ng paksa
+         Bumalik sa lahat ng paksa
       </Link>
 
       <p className="mt-7 text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">

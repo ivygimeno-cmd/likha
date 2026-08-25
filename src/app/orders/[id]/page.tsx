@@ -1063,7 +1063,7 @@ async function respondToRefund(formData: FormData) {
               href={`/messages?order=${order.id}`}
               className="inline-flex shrink-0 items-center justify-center bg-[#173d32] px-7 py-4 font-semibold text-white transition hover:bg-[#b76449]"
             >
-              Open Messages →
+              Open Messages 
             </Link>
           </div>
         </section>
@@ -1363,7 +1363,7 @@ async function respondToRefund(formData: FormData) {
           type="submit"
           className="bg-[#173d32] px-7 py-4 font-semibold text-white transition hover:bg-[#b76449]"
         >
-          Mark as Shipped →
+          Mark as Shipped 
         </button>
       </div>
     </form>
@@ -1515,7 +1515,7 @@ async function respondToRefund(formData: FormData) {
                   type="submit"
                   className="mt-6 bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
                 >
-                  Submit for Buyer Review →
+                  Submit for Buyer Review 
                 </button>
               </form>
             </div>
@@ -1537,7 +1537,7 @@ async function respondToRefund(formData: FormData) {
                   type="submit"
                   className="mt-6 bg-[#b76449] px-7 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
                 >
-                  Mark as Completed →
+                  Mark as Completed 
                 </button>
               </form>
             </div>
@@ -1731,7 +1731,7 @@ async function respondToRefund(formData: FormData) {
     href={`/profile/${revieweeId}`}
     className="inline-flex items-center border border-[#173d32]/20 px-5 py-3 text-sm font-semibold transition hover:border-[#b76449] hover:text-[#b76449]"
   >
-    View {revieweeLabel === "seller" ? "Seller" : "Buyer"} Profile →
+    View {revieweeLabel === "seller" ? "Seller" : "Buyer"} Profile 
   </Link>
 </div>
 

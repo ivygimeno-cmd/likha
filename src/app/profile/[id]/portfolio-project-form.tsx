@@ -228,7 +228,7 @@ export default function PortfolioProjectForm() {
       >
         {loading
           ? "Ina-upload..."
-          : "Idagdag ang Project →"}
+          : "Idagdag ang Project "}
       </button>
     </form>
   );

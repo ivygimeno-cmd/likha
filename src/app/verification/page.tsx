@@ -63,7 +63,7 @@ export default async function VerificationPage() {
               href={`/profile/${user.id}`}
               className="mt-8 inline-flex rounded-lg bg-[#b76449] px-6 py-4 font-semibold text-white"
             >
-              Tingnan ang Profile →
+              Tingnan ang Profile 
             </Link>
           </section>
         ) : (

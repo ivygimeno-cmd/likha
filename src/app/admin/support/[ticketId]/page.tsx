@@ -145,7 +145,7 @@ async function respondToTicket(formData: FormData) {
             href="/admin"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Admin Dashboard
+             Admin Dashboard
           </Link>
         </nav>
       </header>
@@ -211,7 +211,7 @@ async function respondToTicket(formData: FormData) {
               href={`/profile/${ticket.user_id}`}
               className="mt-4 inline-block text-sm font-semibold text-[#b76449]"
             >
-              View Profile →
+              View Profile 
             </Link>
           </div>
 
@@ -264,7 +264,7 @@ async function respondToTicket(formData: FormData) {
               href={`/admin/users/${ticket.user_id}`}
               className="mt-4 inline-block text-sm font-semibold text-[#b76449]"
             >
-              Open Investigation →
+              Open Investigation 
             </Link>
           </div>
         </section>
@@ -376,7 +376,7 @@ async function respondToTicket(formData: FormData) {
       type="submit"
       className="rounded-xl bg-[#173d32] px-6 py-4 font-semibold text-white transition hover:bg-[#245646]"
     >
-      Send Response →
+      Send Response 
     </button>
   </form>
 </section>

@@ -129,7 +129,7 @@ export default function StartVerificationButton() {
       >
         {loading
           ? "Inihahanda ang secure verification..."
-          : "Simulan ang Verification →"}
+          : "Simulan ang Verification "}
       </button>
     </div>
   );

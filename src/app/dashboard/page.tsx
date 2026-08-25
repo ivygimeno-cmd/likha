@@ -210,7 +210,7 @@ const completedOrderCount = (orders ?? []).filter(
             href="/verification"
             className="text-sm font-semibold text-[#b76449] underline decoration-[#b76449]/30 underline-offset-4"
           >
-            Verify Identity →
+            Verify Identity 
           </Link>
         </>
       )}
@@ -269,7 +269,7 @@ const completedOrderCount = (orders ?? []).filter(
       href="/admin"
       className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
     >
-      Open Admin Panel →
+      Open Admin Panel 
     </Link>
   )}
 
@@ -278,8 +278,8 @@ const completedOrderCount = (orders ?? []).filter(
     className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
   >
     {isSeller
-      ? "Maghanap ng Projects →"
-      : "Mag-post ng Request →"}
+      ? "Maghanap ng Projects "
+      : "Mag-post ng Request "}
   </Link>
 </div>
 
@@ -306,7 +306,7 @@ const completedOrderCount = (orders ?? []).filter(
       href={`/profile/${user.id}`}
       className="w-fit rounded-lg border border-[#173d32]/25 px-5 py-3 text-sm font-semibold transition hover:bg-[#173d32] hover:text-white"
     >
-      Tingnan ang Profile →
+      Tingnan ang Profile 
     </Link>
   </section>
 ) : (
@@ -331,7 +331,7 @@ const completedOrderCount = (orders ?? []).filter(
       href="/verification"
       className="w-fit shrink-0 rounded-lg bg-[#b76449] px-6 py-3 font-semibold text-white transition hover:bg-[#9f503c]"
     >
-      Verify Identity →
+      Verify Identity 
     </Link>
   </section>
 )}
@@ -401,7 +401,7 @@ const completedOrderCount = (orders ?? []).filter(
                 href={isSeller ? "/marketplace" : "/request"}
                 className="mt-7 inline-block font-semibold text-[#b76449]"
               >
-                {isSeller ? "Pumunta sa Marketplace →" : "Magpagawa ngayon →"}
+                {isSeller ? "Pumunta sa Marketplace " : "Magpagawa ngayon "}
               </Link>
             </div>
           ) : (
@@ -454,7 +454,7 @@ const completedOrderCount = (orders ?? []).filter(
                     href={`/requests/${request.id}`}
                     className="font-semibold text-[#b76449]"
                   >
-                    Tingnan →
+                    Tingnan 
                   </Link>
                 </article>
               ))}

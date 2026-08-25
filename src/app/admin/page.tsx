@@ -424,7 +424,7 @@ const latestRefundRequests =
             href="/dashboard"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </nav>
       </header>
@@ -505,7 +505,7 @@ const latestRefundRequests =
         href="/admin/account-changes"
         className="text-sm font-semibold text-[#b76449] transition hover:opacity-70"
       >
-        Tignan lahat →
+        Tignan lahat 
       </Link>
     </div>
 
@@ -618,7 +618,7 @@ const latestRefundRequests =
                       </span>
 
                       <span className="text-[#173d32]/35 transition-transform group-open:rotate-90">
-                        →
+                        
                       </span>
                     </div>
                   </div>
@@ -702,7 +702,7 @@ const latestRefundRequests =
       href="/admin/feedback"
       className="text-sm font-semibold text-[#b76449] transition hover:opacity-70"
     >
-      Tingnan lahat →
+      Tingnan lahat 
     </Link>
   </div>
 
@@ -794,7 +794,7 @@ const latestRefundRequests =
       href="/admin/refunds"
       className="text-sm font-semibold text-[#b76449] transition hover:opacity-70"
     >
-      View all →
+      View all 
     </Link>
   </div>
 
@@ -1066,14 +1066,14 @@ data-search-text={`${account.account_name} ${account.email ?? ""} ${account.cont
                     href={`/profile/${account.user_id}`}
                     className="w-fit text-sm font-semibold text-[#b76449]"
                   >
-                    View Profile →
+                    View Profile 
                   </Link>
 
                   <Link
                     href={`/admin/users/${account.user_id}`}
                     className="w-fit text-sm font-semibold text-[#173d32]"
                   >
-                    Investigate →
+                    Investigate 
                   </Link>
 
                   {!account.is_admin && (

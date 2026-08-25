@@ -503,7 +503,7 @@ export default function SignUpPage() {
             >
               {loading
                 ? "Gumagawa ng account..."
-                : "Gumawa ng Account →"}
+                : "Gumawa ng Account "}
             </button>
           </form>
 

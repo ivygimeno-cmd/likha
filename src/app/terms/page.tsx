@@ -230,7 +230,7 @@ export default function TermsPage() {
             href="/"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            Back to Home →
+            Back to Home 
           </Link>
         </nav>
       </header>

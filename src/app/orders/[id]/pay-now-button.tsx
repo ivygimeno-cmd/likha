@@ -64,7 +64,7 @@ export default function PayNowButton({
       >
         {loading
           ? "Opening PayMongo..."
-          : "Pay Now →"}
+          : "Pay Now "}
       </button>
 
       <p className="mt-2 text-xs text-[#173d32]/45">

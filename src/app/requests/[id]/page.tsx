@@ -365,7 +365,7 @@ if (error) {
             href="/dashboard"
             className="text-sm font-semibold hover:text-[#b76449]"
           >
-            ← Dashboard
+             Dashboard
           </Link>
         </nav>
       </header>
@@ -509,7 +509,7 @@ if (error) {
                 href={`/profile/${request.buyer_id}`}
                 className="mt-5 inline-flex items-center border border-[#173d32]/20 px-5 py-3 text-sm font-semibold transition hover:border-[#b76449] hover:text-[#b76449]"
               >
-                View Buyer Profile →
+                View Buyer Profile 
               </Link>
             </div>
           )}
@@ -692,7 +692,7 @@ if (error) {
                   type="submit"
                   className="w-full bg-[#b76449] px-6 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
                 >
-                Ipadala ang Proposal — 15 LIKHA Credits →
+                Ipadala ang Proposal — 15 LIKHA Credits 
                 </button>
               </div>
             </form>
@@ -816,7 +816,7 @@ if (error) {
                           href={`/profile/${proposal.seller_id}`}
                           className="mt-5 inline-flex items-center border border-[#173d32]/20 px-4 py-2.5 text-sm font-semibold transition hover:border-[#b76449] hover:text-[#b76449]"
                         >
-                          View Seller Profile →
+                          View Seller Profile 
                         </Link>
 
                         {proposal.status ===
@@ -851,14 +851,14 @@ if (error) {
                                 className="w-full bg-[#b76449] px-6 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
                               >
                                 Tanggapin ang
-                                Proposal →
+                                Proposal 
                               </button>
                             </form>
                           ) : (
                             <details className="mt-6 border border-[#b76449]/35 bg-[#b76449]/10 p-5">
                               <summary className="cursor-pointer list-none font-semibold text-[#9f503c]">
                                 Review verification
-                                warning →
+                                warning 
                               </summary>
 
                               <div className="mt-4 border-t border-[#b76449]/25 pt-4">
@@ -908,7 +908,7 @@ if (error) {
                                     className="w-full bg-[#b76449] px-6 py-4 font-semibold text-white transition hover:bg-[#9f503c]"
                                   >
                                     Nauunawaan ko —
-                                    Tanggapin pa rin →
+                                    Tanggapin pa rin 
                                   </button>
                                 </form>
                               </div>
