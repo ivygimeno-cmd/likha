@@ -166,9 +166,7 @@ if (openRequestsError) {
 )}
       <section className="border-b border-[#173d32]/15">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-            Marketplace
-          </p>
+
 
           <div className="mt-4 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div>

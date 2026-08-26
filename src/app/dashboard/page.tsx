@@ -15,95 +15,100 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-    const {
-    data: isAdmin,
-    error: adminAccessError,
-  } = await supabase.rpc("is_likha_admin");
+   const [
+    { data: isAdmin, error: adminAccessError },
+    { data: profile },
+    { data: verificationData },
+  ] = await Promise.all([
+    supabase.rpc("is_likha_admin"),
+
+    supabase
+      .from("profiles")
+      .select("full_name, role, business_name, avatar_url")
+      .eq("id", user.id)
+      .single(),
+
+    supabase
+      .rpc("get_public_identity_verification", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
+  ]);
 
   if (adminAccessError) {
     throw new Error(
       `Hindi ma-check ang admin access: ${adminAccessError.message}`,
     );
   }
-  
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, role, business_name, avatar_url")
-    .eq("id", user.id)
-    .single();
+  const verification = verificationData as {
+    is_verified: boolean;
+  } | null;
 
-    const { data: verificationData } = await supabase
-  .rpc("get_public_identity_verification", {
-    p_profile_id: user.id,
-  })
-  .maybeSingle();
-
-const verification = verificationData as {
-  is_verified: boolean;
-} | null;
-
-const isIdentityVerified =
-  verification?.is_verified === true;
+  const isIdentityVerified =
+    verification?.is_verified === true;
 
   const role = profile?.role ?? "buyer";
   const isSeller = role === "seller";
 
   const [
-  { data: publicProfileData },
-  { data: ratingData },
-] = await Promise.all([
-  supabase
-    .rpc("get_public_profile", {
-      p_profile_id: user.id,
-    })
-    .maybeSingle(),
+    { data: publicProfileData },
+    { data: ratingData },
+    { data: creditBalanceData },
+  ] = await Promise.all([
+    supabase
+      .rpc("get_public_profile", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
 
-  supabase
-    .rpc("get_profile_rating", {
-      p_profile_id: user.id,
-    })
-    .maybeSingle(),
-]);
+    supabase
+      .rpc("get_profile_rating", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
 
-const publicProfile = publicProfileData as {
-  display_name: string;
-} | null;
+    supabase
+      .rpc("get_my_likha_credit_balance")
+      .maybeSingle(),
+  ]);
 
-const rating = ratingData as {
-  average_rating: number | string;
-  total_reviews: number;
-} | null;
+  const publicProfile = publicProfileData as {
+    display_name: string;
+  } | null;
 
-const dashboardDisplayName =
-  publicProfile?.display_name ??
-  profile?.full_name ??
-  profile?.business_name ??
-  "LIKHA user";
+  const rating = ratingData as {
+    average_rating: number | string;
+    total_reviews: number;
+  } | null;
 
-const averageRating = Number(
-  rating?.average_rating ?? 0,
-);
+  const dashboardDisplayName =
+    publicProfile?.display_name ??
+    profile?.full_name ??
+    profile?.business_name ??
+    "LIKHA user";
 
-const totalReviews = Number(
-  rating?.total_reviews ?? 0,
-);
+  const averageRating = Number(
+    rating?.average_rating ?? 0,
+  );
 
-const roundedRating = Math.min(
-  5,
-  Math.max(0, Math.round(averageRating)),
-);
-const { data: creditBalanceData } = await supabase
-  .rpc("get_my_likha_credit_balance")
-  .maybeSingle();
+  const totalReviews = Number(
+    rating?.total_reviews ?? 0,
+  );
 
-const creditBalanceResult = creditBalanceData as {
-  balance: number | string;
-} | null;
+  const roundedRating = Math.min(
+    5,
+    Math.max(0, Math.round(averageRating)),
+  );
 
-const creditBalance = Number(
-  creditBalanceResult?.balance ?? 0,
-);
+  const creditBalanceResult = creditBalanceData as {
+    balance: number | string;
+  } | null;
+
+  const creditBalance = Number(
+    creditBalanceResult?.balance ?? 0,
+  );
+
   let requestQuery = supabase
     .from("project_requests")
     .select(
@@ -111,42 +116,53 @@ const creditBalance = Number(
     )
     .order("created_at", { ascending: false });
 
-if (isSeller) {
-  requestQuery = requestQuery
-    .eq("status", "open")
-    .neq("buyer_id", user.id);
-}
-  const {
-  data: requests,
-  error: requestsError,
-} = await requestQuery.limit(6);
+  if (isSeller) {
+    requestQuery = requestQuery
+      .eq("status", "open")
+      .neq("buyer_id", user.id);
+  }
 
-if (requestsError) {
-  throw new Error(
-    `Hindi ma-load ang project requests: ${requestsError.message}`,
-  );
-}
+  const [
+    {
+      data: requests,
+      error: requestsError,
+    },
+    { data: proposals },
+    { data: orders },
+  ] = await Promise.all([
+    requestQuery.limit(6),
 
-  const { data: proposals } = await supabase
-  .from("proposals")
-  .select("id, status");
+    supabase
+      .from("proposals")
+      .select("id, status"),
 
-const { data: orders } = await supabase
-  .from("orders")
-  .select("id, status");
+    supabase
+      .from("orders")
+      .select("id, status"),
+  ]);
 
-const openRequestCount = isSeller
-  ? (requests?.length ?? 0)
-  : (requests ?? []).filter((request) => request.status === "open").length;
+  if (requestsError) {
+    throw new Error(
+      `Hindi ma-load ang project requests: ${requestsError.message}`,
+    );
+  }
 
-const activeOrderCount = (orders ?? []).filter(
-  (order) =>
-    order.status === "in_progress" || order.status === "submitted",
-).length;
+  const openRequestCount = isSeller
+    ? (requests?.length ?? 0)
+    : (requests ?? []).filter(
+        (request) => request.status === "open",
+      ).length;
 
-const completedOrderCount = (orders ?? []).filter(
-  (order) => order.status === "completed",
-).length;
+  const activeOrderCount = (orders ?? []).filter(
+    (order) =>
+      order.status === "in_progress" ||
+      order.status === "submitted",
+  ).length;
+
+  const completedOrderCount = (orders ?? []).filter(
+    (order) => order.status === "completed",
+  ).length;
+
 
 
   return (
@@ -154,226 +170,179 @@ const completedOrderCount = (orders ?? []).filter(
       <AuthenticatedNavbar />
 
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
-        <section className="flex flex-col justify-between gap-7 border-b border-[#173d32]/15 pb-10 md:flex-row md:items-end">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-              {isSeller ? "Seller workspace" : "Buyer workspace"}
-            </p>
 
-            <h1 className="mt-3 font-serif text-5xl font-semibold">
-              Magandang araw
-              {profile?.full_name
-                ? `, ${profile.full_name.split(" ")[0]}`
-                : ""}
-              .
-            </h1>
-
-            <p className="mt-4 text-[#173d32]/65">
-              {isSeller
-                ? "Tingnan ang mga bagong request na maaari mong gawan ng proposal."
-                : "Pamahalaan ang iyong custom requests at seller proposals."}
-            </p>
-
-<div className="mt-7 flex flex-col gap-5 sm:flex-row sm:items-center">
-  <AvatarUpload
-    userId={user.id}
-    currentAvatarUrl={profile?.avatar_url ?? null}
-    displayName={dashboardDisplayName}
-    editable={false}
-    size="dashboard"
-  />
-
+<section className="border-b border-[#173d32]/15 pb-10">
+  {/* Dashboard heading */}
   <div>
-<p className="font-serif text-5xl leading-none font-semibold">
-  {dashboardDisplayName}
-</p>
+    <h1 className="font-serif text-5xl font-semibold">
+      Magandang araw
+      {profile?.full_name
+        ? `, ${profile.full_name.split(" ")[0]}`
+        : ""}
+      .
+    </h1>
 
-    <p className="mt-1 text-sm text-[#173d32]/55">
+    <p className="mt-4 text-[#173d32]/65">
       {isSeller
-        ? "Seller workspace"
-        : "Buyer workspace"}
+        ? "Tingnan ang mga bagong request na maaari mong gawan ng proposal."
+        : "Pamahalaan ang iyong custom requests at seller proposals."}
     </p>
+  </div>
 
-    <div className="mt-3 flex flex-wrap items-center gap-3">
-      {isIdentityVerified ? (
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#173d32] px-3 py-1.5 text-xs font-semibold text-white">
-          <span aria-hidden="true">✓</span>
-          Identity Verified
-        </span>
-      ) : (
-        <>
-          <span className="inline-flex rounded-full border border-[#b76449]/40 bg-[#b76449]/10 px-3 py-1.5 text-xs font-semibold text-[#9f503c]">
-            Not Verified
-          </span>
+  {/* Main dashboard area */}
+  <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-start">
+    {/* LEFT SIDE */}
+    <div className="flex flex-col">
+      {/* Profile */}
+      <div className="flex items-start gap-6">
+        <AvatarUpload
+          userId={user.id}
+          currentAvatarUrl={profile?.avatar_url ?? null}
+          displayName={dashboardDisplayName}
+          editable={false}
+          size="dashboard"
+        />
 
-          <Link
-            href="/verification"
-            className="text-sm font-semibold text-[#b76449] underline decoration-[#b76449]/30 underline-offset-4"
-          >
-            Verify Identity 
-          </Link>
-        </>
-      )}
+        <div className="min-w-0 flex-1">
+          {/* Name + Verified badge */}
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="font-serif text-5xl font-semibold">
+              {dashboardDisplayName}
+            </h2>
+
+            {isIdentityVerified && (
+              <span
+                title="Government ID and selfie/liveness were successfully confirmed."
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#789b82] px-3 py-2 text-xs font-semibold text-white"
+              >
+                <span aria-hidden="true">✓</span>
+                Identity Verified
+              </span>
+            )}
+          </div>
+
+          {/* Rating */}
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <div
+              className="text-xl tracking-[0.08em] text-[#b76449]"
+              aria-label={`${averageRating} out of 5 stars`}
+            >
+              {"★".repeat(roundedRating)}
+
+              <span className="text-[#173d32]/15">
+                {"★".repeat(5 - roundedRating)}
+              </span>
+            </div>
+
+            <p className="text-sm font-semibold">
+              {averageRating.toFixed(1)}
+
+              <span className="ml-1 font-normal text-[#173d32]/50">
+                ({totalReviews}{" "}
+                {totalReviews === 1 ? "review" : "reviews"})
+              </span>
+            </p>
+          </div>
+
+          {/* Credits */}
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="min-w-56 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
+                Available Credits
+              </p>
+
+              <p className="mt-1 font-serif text-3xl font-semibold">
+                {creditBalance.toLocaleString("en-PH")}
+              </p>
+            </div>
+
+            <Link
+              href="/credits"
+              className="inline-flex rounded-lg bg-[#173d32] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#245646]"
+            >
+              Bumili ng Credits
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
 
-<div className="mt-3 flex flex-wrap items-center gap-3">
-  <div
-    className="text-xl tracking-[0.08em] text-[#b76449]"
-    aria-label={`${averageRating} out of 5 stars`}
-  >
-    {"★".repeat(roundedRating)}
-
-    <span className="text-[#173d32]/15">
-      {"★".repeat(5 - roundedRating)}
-    </span>
-  </div>
-
-  <p className="text-sm font-semibold">
-    {averageRating.toFixed(1)}
-
-    <span className="ml-1 font-normal text-[#173d32]/50">
-      ({totalReviews}{" "}
-      {totalReviews === 1 ? "review" : "reviews"})
-    </span>
-  </p>
-</div>
-
-<div className="mt-5 flex flex-wrap items-center gap-4">
-  <div className="min-w-36 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-5 py-3">
-    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
-      Available Credits
-    </p>
-
-    <p className="mt-1 font-serif text-3xl font-semibold">
-      {creditBalance.toLocaleString("en-PH")}
-    </p>
-  </div>
-
-  <Link
-    href="/credits"
-    className="inline-flex rounded-lg bg-[#173d32] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#245646]"
-  >
-    Bumili ng Credits
-  </Link>
-
-</div>
-
-    </div>
-  </div>
-</div>
-
-
-<div className="flex w-fit flex-col gap-3">
-  {isAdmin === true && (
+    {/* RIGHT SIDE */}
+   <div className="flex flex-col gap-5 lg:-mt-25">
+      {/* Action buttons */}
+  <div className="ml-auto flex w-[225px] flex-col gap-4">
+       {isAdmin === true && (
     <Link
       href="/admin"
-      className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
-    >
-      Open Admin Panel 
+ className="rounded-md border border-[#173d32]/20 bg-[#fbf8f1] px-7 py-4 text-center font-semibold text-[#173d32] transition hover:border-[#173d32]/40 hover:bg-white"
+ 
+ >
+      Open Admin Panel
     </Link>
   )}
+
+  <Link
+    href={`/profile/${user.id}`}
+className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
+ >
+    View Profile
+  </Link>
 
   <Link
     href={isSeller ? "/marketplace" : "/request"}
     className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
   >
     {isSeller
-      ? "Maghanap ng Projects "
-      : "Mag-post ng Request "}
+      ? "Maghanap ng Proyekto"
+      : "Mag-post ng Request"}
   </Link>
 </div>
 
+      {/* Dashboard statistics */}
+  <div className="mt-6 border border-[#173d32]/20">
+        <div className="grid grid-cols-3 divide-x divide-[#173d32]/20">
+          <div className="px-6 py-7">
+            <p className="text-sm text-[#173d32]/55">
+              {isSeller ? "Available projects" : "Active orders"}
+            </p>
 
-        </section>
-        {isIdentityVerified ? (
-  <section className="my-8 flex flex-col justify-between gap-5 rounded-2xl border border-[#173d32]/20 bg-[#dfe9df] p-6 sm:flex-row sm:items-center">
-    <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#173d32]/60">
-        Account security
-      </p>
+            <p className="mt-6 font-serif text-4xl font-semibold">
+              {isSeller ? openRequestCount : activeOrderCount}
+            </p>
+          </div>
 
-      <h2 className="mt-2 font-serif text-3xl font-semibold">
-        ✓ Identity Verified
-      </h2>
+          <div className="px-6 py-7">
+            <p className="text-sm text-[#173d32]/55">
+              {isSeller
+                ? "Submitted proposals"
+                : "Received proposals"}
+            </p>
 
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#173d32]/65">
-        Na-confirm na ang iyong government ID at selfie/liveness.
-        Makikita ng buyers at sellers ang verified badge sa iyong profile.
-      </p>
+            <p className="mt-6 font-serif text-4xl font-semibold">
+              {proposals?.length ?? 0}
+            </p>
+          </div>
+
+          <div className="px-6 py-7">
+            <p className="text-sm text-[#173d32]/55">
+              Completed orders
+            </p>
+
+            <p className="mt-6 font-serif text-4xl font-semibold">
+              {completedOrderCount}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <Link
-      href={`/profile/${user.id}`}
-      className="w-fit rounded-lg border border-[#173d32]/25 px-5 py-3 text-sm font-semibold transition hover:bg-[#173d32] hover:text-white"
-    >
-      Tingnan ang Profile 
-    </Link>
-  </section>
-) : (
-  <section className="my-8 flex flex-col justify-between gap-5 rounded-2xl border border-[#b76449]/30 bg-[#b76449]/10 p-6 sm:flex-row sm:items-center">
-    <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#b76449]">
-        Optional identity verification
-      </p>
-
-      <h2 className="mt-2 font-serif text-3xl font-semibold">
-        Palakasin ang tiwala sa iyong LIKHA profile.
-      </h2>
-
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#173d32]/65">
-        I-confirm ang iyong government ID at selfie/liveness para
-        magkaroon ng Identity Verified badge. Pribado ang iyong ID
-        details at hindi ito ipapakita sa public profile.
-      </p>
-    </div>
-
-    <Link
-      href="/verification"
-      className="w-fit shrink-0 rounded-lg bg-[#b76449] px-6 py-3 font-semibold text-white transition hover:bg-[#9f503c]"
-    >
-      Verify Identity 
-    </Link>
-  </section>
-)}
-
-    <section className="grid gap-px overflow-hidden border border-[#173d32]/15 bg-[#173d32]/15 md:grid-cols-3">
-  <div className="bg-[#fbf8f1] p-7">
-    <p className="text-sm text-[#173d32]/55">
-      {isSeller ? "Available projects" : "Active orders"}
-    </p>
-
-    <p className="mt-3 font-serif text-4xl font-semibold">
-      {isSeller ? openRequestCount : activeOrderCount}
-    </p>
-  </div>
-
-  <div className="bg-[#fbf8f1] p-7">
-    <p className="text-sm text-[#173d32]/55">
-      {isSeller ? "Submitted proposals" : "Received proposals"}
-    </p>
-
-    <p className="mt-3 font-serif text-4xl font-semibold">
-      {proposals?.length ?? 0}
-    </p>
-  </div>
-
-  <div className="bg-[#fbf8f1] p-7">
-    <p className="text-sm text-[#173d32]/55">
-      Completed orders
-    </p>
-
-    <p className="mt-3 font-serif text-4xl font-semibold">
-      {completedOrderCount}
-    </p>
   </div>
 </section>
+
 
         <section className="mt-14">
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-                {isSeller ? "Open requests" : "Your requests"}
-              </p>
+
 
               <h2 className="mt-2 font-serif text-4xl font-semibold">
                 {isSeller

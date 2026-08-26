@@ -5,6 +5,8 @@ import PortfolioProjectForm from "./portfolio-project-form";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 import AvatarUpload from "@/app/dashboard/avatar-upload";
 import FollowButton from "./follow-button";
+import FeatureProjectButton from "@/app/components/feature-project-button";
+import ProjectDescription from "./project-description";
 
 type PageProps = {
   params: Promise<{
@@ -203,13 +205,28 @@ const visibleBadges = earnedBadges.slice(0, 6);
 
 const hasMoreBadges = earnedBadges.length > 6;
 
-  const { data: projectData } = await supabase
-    .from("portfolio_projects")
-    .select(
-      "id, title, description, image_path, created_at",
-    )
-    .eq("owner_id", profile.id)
-    .order("created_at", { ascending: false });
+const { data: projectData } = await supabase
+  .from("portfolio_projects")
+  .select(
+    "id, title, description, image_path, created_at",
+  )
+  .eq("owner_id", profile.id)
+  .order("created_at", { ascending: false });
+
+
+
+
+const { data: featuredProjectData } = await supabase
+  .from("featured_projects")
+  .select("project_id")
+  .eq("profile_id", profile.id)
+  .eq("is_active", true);
+
+const featuredProjectIds = new Set(
+  (featuredProjectData ?? []).map(
+    (item) => item.project_id,
+  ),
+);
 
   const reviews =
     (reviewData ?? []) as ProfileReview[];
@@ -777,11 +794,19 @@ const { count: purchasedProjects } = await supabase
                         {project.title}
                       </h3>
 
-                      {project.description && (
-                        <p className="mt-3 whitespace-pre-wrap leading-7 text-[#173d32]/65">
-                          {project.description}
-                        </p>
-                      )}
+                   {project.description && (
+  <ProjectDescription description={project.description} />
+)}
+
+                      {isOwnProfile && (
+  <FeatureProjectButton
+    projectId={project.id}
+    isVip={isVip}
+    isFeatured={featuredProjectIds.has(project.id)}
+  />
+)}
+
+  
 
                     </div>
 
@@ -797,10 +822,6 @@ const { count: purchasedProjects } = await supabase
 
         {isOwnProfile && (
           <section className="border-t border-[#173d32]/15 py-10">
-
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-              Legal & Privacy
-            </p>
 
             <h2 className="mt-2 font-serif text-3xl font-semibold">
               Mga patakaran ng LIKHA

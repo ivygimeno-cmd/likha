@@ -101,13 +101,18 @@ if (deliveryError) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f5f0e6] px-6 text-[#173d32]">
         <section className="w-full max-w-2xl rounded-3xl border border-[#173d32]/15 bg-[#fbf8f1] p-8 text-center shadow-xl sm:p-14">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#173d32] text-2xl text-white">
-            ✓
-          </div>
+<div className="flex items-center justify-center gap-3">
+  <span
+    aria-hidden="true"
+    className="text-2xl font-semibold text-[#173d32]"
+  >
+    ✓
+  </span>
 
-          <p className="mt-8 text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-            Request received
-          </p>
+  <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b76449]">
+    NATANGGAP NAMIN ANG IYONG REQUEST.
+  </p>
+</div>
 
           <h1 className="mt-4 font-serif text-4xl font-semibold sm:text-5xl">
             Hahanapan ka namin ng tamang creator.
@@ -161,9 +166,7 @@ if (deliveryError) {
 
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-14 lg:grid-cols-[0.75fr_1.25fr] lg:px-10 lg:py-20">
         <aside>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-            Ipagawa Mo
-          </p>
+  
 
           <h1 className="mt-4 font-serif text-5xl leading-tight font-semibold sm:text-6xl">
             Ano ang gusto mong malikha?
@@ -335,9 +338,7 @@ if (deliveryError) {
 
 <div className="space-y-6 rounded-2xl border border-[#173d32]/15 bg-[#f5f0e6]/60 p-5 sm:p-6">
   <div>
-    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#b76449]">
-      Delivery details
-    </p>
+  
 
     <h2 className="mt-2 font-serif text-2xl font-semibold">
       Saan ipapadala ang finished order?

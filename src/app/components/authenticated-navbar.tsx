@@ -17,17 +17,21 @@ export default async function AuthenticatedNavbar() {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, full_name, business_name, avatar_url")
-    .eq("id", user.id)
-    .single();
+const [{ data: profile }, { data: notificationsData }] =
+  await Promise.all([
+    supabase
+      .from("profiles")
+      .select("role, full_name, business_name, avatar_url")
+      .eq("id", user.id)
+      .single(),
 
-    const { data: notificationsData } = await supabase
-  .from("notifications")
-  .select("id, type, title, message, href, read_at, created_at")
-  .order("created_at", { ascending: false })
-  .limit(8);
+    supabase
+      .from("notifications")
+      .select("id, type, title, message, href, read_at, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
 
 const notifications = notificationsData ?? [];
 
