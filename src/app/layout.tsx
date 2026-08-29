@@ -3,8 +3,8 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import SessionGuard from "@/app/components/session-guard";
 import PushNotificationSetup from "@/app/components/push-notification-setup";
-import { createClient } from "@/lib/supabase/server";
 import VipSupportChat from "@/app/components/vip-support-chat";
+import { getCurrentUser } from "@/lib/current-user";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,40 +29,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
+  const currentUser = await getCurrentUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let isVip = false;
-  let isAdmin = false;
-
-  if (user) {
-    const [profileResult, adminResult] =
-      await Promise.all([
-        supabase
-          .from("profiles")
-          .select("account_tier, vip_expires_at")
-          .eq("id", user.id)
-          .maybeSingle(),
-
-        supabase.rpc("is_likha_admin"),
-      ]);
-
-    const profile = profileResult.data;
-
-    if (
-      profile?.account_tier === "vip" &&
-      profile?.vip_expires_at &&
-      new Date(profile.vip_expires_at).getTime() >
-        Date.now()
-    ) {
-      isVip = true;
-    }
-
-    isAdmin = adminResult.data === true;
-  }
+  const user = currentUser?.user ?? null;
+  const isVip = currentUser?.isVip ?? false;
+  const isAdmin = currentUser?.isAdmin ?? false;
 
   return (
     <html

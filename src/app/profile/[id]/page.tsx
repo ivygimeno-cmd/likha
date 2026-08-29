@@ -92,28 +92,109 @@ export default async function PublicProfilePage({
     notFound();
   }
 
-  const { data: avatarData } = await supabase.rpc(
-    "get_public_avatar",
-    {
+  const [
+    { data: avatarData },
+    { data: ratingData },
+    { data: verificationData },
+    { data: reviewData },
+    { data: profileBadgesData },
+    { data: earnedBadgesData },
+    { data: projectData },
+    { data: featuredProjectData },
+    { count: followerCount },
+    { count: followingCount },
+    { count: completedProjects },
+    { count: purchasedProjects },
+    { data: creditBalanceData },
+  ] = await Promise.all([
+    supabase.rpc("get_public_avatar", {
       p_profile_id: id,
-    },
-  );
+    }),
+
+    supabase
+      .rpc("get_profile_rating", {
+        p_profile_id: id,
+      })
+      .maybeSingle(),
+
+    supabase
+      .rpc("get_public_identity_verification", {
+        p_profile_id: id,
+      })
+      .maybeSingle(),
+
+    supabase.rpc("get_profile_reviews", {
+      p_profile_id: id,
+    }),
+
+    supabase
+      .rpc("get_public_profile_badges", {
+        p_profile_id: id,
+      })
+      .maybeSingle(),
+
+    supabase.rpc("get_public_profile_badges", {
+      p_profile_id: id,
+    }),
+
+    supabase
+      .from("portfolio_projects")
+      .select(
+        "id, title, description, image_path, created_at",
+      )
+      .eq("owner_id", id)
+      .order("created_at", { ascending: false }),
+
+    supabase
+      .from("featured_projects")
+      .select("project_id")
+      .eq("profile_id", id)
+      .eq("is_active", true),
+
+    supabase
+      .from("follows")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("following_id", id),
+
+    supabase
+      .from("follows")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("follower_id", id),
+
+    supabase
+      .from("orders")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("seller_id", id)
+      .eq("status", "completed"),
+
+    supabase
+      .from("orders")
+      .select("*", {
+        count: "exact",
+        head: true,
+      })
+      .eq("buyer_id", id)
+      .eq("status", "completed"),
+
+    user.id === id
+      ? supabase
+          .rpc("get_my_likha_credit_balance")
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
 
   const avatarUrl = avatarData as string | null;
 
-  const { data: ratingData } = await supabase
-    .rpc("get_profile_rating", {
-      p_profile_id: id,
-    })
-    .maybeSingle();
-
   const rating = ratingData as RatingSummary | null;
-
-  const { data: verificationData } = await supabase
-    .rpc("get_public_identity_verification", {
-      p_profile_id: id,
-    })
-    .maybeSingle();
 
   const identityVerification =
     verificationData as IdentityVerification | null;
@@ -121,18 +202,8 @@ export default async function PublicProfilePage({
   const isIdentityVerified =
     identityVerification?.is_verified === true;
 
-  const { data: reviewData } = await supabase.rpc(
-    "get_profile_reviews",
-    {
-      p_profile_id: id,
-    },
-  );
-
-  const { data: profileBadgesData } = await supabase
-    .rpc("get_public_profile_badges", {
-      p_profile_id: id,
-    })
-    .maybeSingle();
+  const reviews =
+    (reviewData ?? []) as ProfileReview[];
 
   const profileBadges = profileBadgesData as {
     created_at: string;
@@ -183,53 +254,12 @@ export default async function PublicProfilePage({
   const hasAdminBadge =
     profileBadges?.is_admin_badge === true;
 
-  /*
-   * EARNED BADGES
-   *
-   * Only badges that actually exist in user_badges
-   * are shown on the public profile.
-   *
-   * Order:
-   * Mythic → Legendary → Rare → Uncommon → Common
-   */
-const { data: earnedBadgesData } = await supabase.rpc(
-  "get_public_profile_badges",
-  {
-    p_profile_id: profile.id,
-  },
-);
+  const earnedBadges =
+    (earnedBadgesData ?? []) as EarnedBadge[];
 
-const earnedBadges = (earnedBadgesData ?? []) as EarnedBadge[];
+  const visibleBadges = earnedBadges.slice(0, 6);
 
-const visibleBadges = earnedBadges.slice(0, 6);
-
-const hasMoreBadges = earnedBadges.length > 6;
-
-const { data: projectData } = await supabase
-  .from("portfolio_projects")
-  .select(
-    "id, title, description, image_path, created_at",
-  )
-  .eq("owner_id", profile.id)
-  .order("created_at", { ascending: false });
-
-
-
-
-const { data: featuredProjectData } = await supabase
-  .from("featured_projects")
-  .select("project_id")
-  .eq("profile_id", profile.id)
-  .eq("is_active", true);
-
-const featuredProjectIds = new Set(
-  (featuredProjectData ?? []).map(
-    (item) => item.project_id,
-  ),
-);
-
-  const reviews =
-    (reviewData ?? []) as ProfileReview[];
+  const hasMoreBadges = earnedBadges.length > 6;
 
   const projects = (
     (projectData ?? []) as PortfolioProject[]
@@ -246,6 +276,12 @@ const featuredProjectIds = new Set(
       imageUrl,
     };
   });
+
+  const featuredProjectIds = new Set(
+    (featuredProjectData ?? []).map(
+      (item) => item.project_id,
+    ),
+  );
 
   const averageRating = Number(
     rating?.average_rating ?? 0,
@@ -267,48 +303,9 @@ const featuredProjectIds = new Set(
   const isOwnProfile =
     user.id === profile.id;
 
-  const { count: followerCount } = await supabase
-    .from("follows")
-    .select("*", {
-      count: "exact",
-      head: true,
-    })
-    .eq("following_id", profile.id);
-
-  const { count: followingCount } = await supabase
-    .from("follows")
-    .select("*", {
-      count: "exact",
-      head: true,
-    })
-    .eq("follower_id", profile.id);
-
-    const { count: completedProjects } = await supabase
-  .from("orders")
-  .select("*", {
-    count: "exact",
-    head: true,
-  })
-  .eq("seller_id", profile.id)
-  .eq("status", "completed");
-
-const { count: purchasedProjects } = await supabase
-  .from("orders")
-  .select("*", {
-    count: "exact",
-    head: true,
-  })
-  .eq("buyer_id", profile.id)
-  .eq("status", "completed");
-
   let creditBalance = 0;
 
   if (isOwnProfile) {
-    const { data: creditBalanceData } =
-      await supabase
-        .rpc("get_my_likha_credit_balance")
-        .maybeSingle();
-
     const creditBalanceResult =
       creditBalanceData as {
         balance: number | string;

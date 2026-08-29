@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import NotificationDropdown from "./notification-dropdown";
 import RealtimeNotificationRefresh from "./realtime-notification-refresh";
 import { refresh } from "next/cache";
@@ -8,34 +9,32 @@ import GlobalSearch from "./global-search";
 import ProfileDropdown from "./profile-dropdown";
 
 export default async function AuthenticatedNavbar() {
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  const currentUser = await getCurrentUser();
 
-  const [{ data: profile }, { data: notificationsData }] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("role, full_name, business_name, avatar_url")
-        .eq("id", user.id)
-        .single(),
+if (!currentUser) {
+  redirect("/login");
+}
 
-      supabase
-        .from("notifications")
-        .select(
-          "id, type, title, message, href, read_at, created_at",
-        )
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(8),
-    ]);
+const {
+  user,
+  profile,
+} = currentUser;
 
+const supabase = await createClient();
+
+const { data: notificationsData } =
+  await supabase
+    .from("notifications")
+    .select(
+      "id, type, title, message, href, read_at, created_at",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+    
   const notifications = notificationsData ?? [];
 
   const unreadCount = notifications.filter(
