@@ -27,6 +27,7 @@ export default function VipSupportChat({
   isVip,
 }: VipSupportChatProps) {
   const [open, setOpen] = useState(false);
+
   const [conversationId, setConversationId] =
     useState<number | null>(null);
 
@@ -35,6 +36,7 @@ export default function VipSupportChat({
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [loadingMessages, setLoadingMessages] =
     useState(false);
 
@@ -155,52 +157,8 @@ export default function VipSupportChat({
   }, [messages]);
 
   /*
-   * Close chat when clicking outside.
+   * Send support message.
    */
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function handleClickOutside(
-      event: MouseEvent,
-    ) {
-      const target =
-        event.target as Node;
-
-      const chatPanel =
-        document.getElementById(
-          "likha-vip-support-chat",
-        );
-
-      const chatButton =
-        document.getElementById(
-          "likha-support-button",
-        );
-
-      if (
-        chatPanel &&
-        !chatPanel.contains(target) &&
-        chatButton &&
-        !chatButton.contains(target)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside,
-    );
-
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside,
-      );
-    };
-  }, [open]);
-
   async function sendMessage() {
     const trimmedMessage =
       message.trim();
@@ -262,6 +220,10 @@ export default function VipSupportChat({
     setLoading(false);
   }
 
+  /*
+   * Enter = send
+   * Shift + Enter = new line
+   */
   function handleKeyDown(
     event: React.KeyboardEvent<HTMLTextAreaElement>,
   ) {
@@ -290,176 +252,191 @@ export default function VipSupportChat({
 
       {open && (
         <div
-          id="likha-vip-support-chat"
-          className="fixed bottom-6 right-6 z-[60] flex h-[520px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl"
+          className="fixed inset-0 z-[59]"
+          onClick={() => setOpen(false)}
         >
-          <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
-            <div>
-              <p className="font-semibold">
-                LIKHA Support
-              </p>
+          <div
+            id="likha-vip-support-chat"
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+            className="fixed bottom-6 right-6 z-[60] flex h-[520px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
+              <div>
+                <p className="font-semibold">
+                  LIKHA Support
+                </p>
 
-              <p className="mt-0.5 text-xs text-white/60">
-                {isVip
-                  ? "Priority Support"
-                  : "VIP Support"}
-              </p>
-            </div>
+                <p className="mt-0.5 text-xs text-white/60">
+                  {isVip
+                    ? "Priority Support"
+                    : "VIP Support"}
+                </p>
+              </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setOpen(false)
-              }
-              className="text-xl text-white/60 hover:text-white"
-              aria-label="Isara ang chat"
-            >
-              ×
-            </button>
-          </div>
-
-          {!isVip ? (
-            <div className="flex flex-1 flex-col items-center justify-center px-7 text-center">
-              <p className="font-serif text-2xl font-semibold">
-                Priority Support
-              </p>
-
-              <p className="mt-3 text-sm leading-6 text-[#173d32]/60">
-                Ang Priority Support
-                ay para sa LIKHA VIP
-                members.
-              </p>
-
-              <a
-                href="/vip"
-                className="mt-6 rounded-lg bg-[#173d32] px-6 py-3 text-sm font-semibold text-white hover:bg-[#245646]"
+              <button
+                type="button"
+                onClick={() =>
+                  setOpen(false)
+                }
+                className="text-xl text-white/60 transition hover:text-white"
+                aria-label="Isara ang chat"
               >
-                Mag-upgrade sa VIP
-              </a>
+                ×
+              </button>
             </div>
-          ) : (
-            <>
-              <div className="flex-1 overflow-y-auto bg-[#f7f2e9] px-4 py-5">
-                {loadingMessages ? (
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-sm text-[#173d32]/45">
-                      Nilo-load ang
-                      conversation...
-                    </p>
-                  </div>
-                ) : messages.length ===
-                  0 ? (
-                  <div className="flex h-full flex-col items-center justify-center text-center">
-                    <p className="font-serif text-2xl font-semibold">
-                      Kumusta!
-                    </p>
 
-                    <p className="mt-2 text-sm leading-6 text-[#173d32]/55">
-                      Paano ka namin
-                      matutulungan?
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {messages.map(
-                      (item) => {
-                        const isOwn =
-                          item.sender_id ===
-                          userId;
+            {!isVip ? (
+              /* Non-VIP */
+              <div className="flex flex-1 flex-col items-center justify-center px-7 text-center">
+                <p className="font-serif text-2xl font-semibold">
+                  Priority Support
+                </p>
 
-                        return (
-                          <div
-                            key={
-                              item.id
-                            }
-                            className={`flex ${
-                              isOwn
-                                ? "justify-end"
-                                : "justify-start"
-                            }`}
-                          >
+                <p className="mt-3 text-sm leading-6 text-[#173d32]/60">
+                  Ang Priority Support
+                  ay para sa LIKHA VIP
+                  members.
+                </p>
+
+                <Link
+                  href="/vip"
+                  onClick={() =>
+                    setOpen(false)
+                  }
+                  className="mt-6 rounded-lg bg-[#173d32] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245646]"
+                >
+                  Mag-upgrade sa VIP
+                </Link>
+              </div>
+            ) : (
+              <>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto bg-[#f7f2e9] px-4 py-5">
+                  {loadingMessages ? (
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-sm text-[#173d32]/45">
+                        Nilo-load ang
+                        conversation...
+                      </p>
+                    </div>
+                  ) : messages.length ===
+                    0 ? (
+                    <div className="flex h-full flex-col items-center justify-center text-center">
+                      <p className="font-serif text-2xl font-semibold">
+                        Kumusta!
+                      </p>
+
+                      <p className="mt-2 text-sm leading-6 text-[#173d32]/55">
+                        Paano ka namin
+                        matutulungan?
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {messages.map(
+                        (item) => {
+                          const isOwn =
+                            item.sender_id ===
+                            userId;
+
+                          return (
                             <div
-                              className={`max-w-[82%] rounded-2xl px-4 py-3 ${
+                              key={
+                                item.id
+                              }
+                              className={`flex ${
                                 isOwn
-                                  ? "rounded-br-sm bg-[#173d32] text-white"
-                                  : "rounded-bl-sm border border-[#173d32]/10 bg-white"
+                                  ? "justify-end"
+                                  : "justify-start"
                               }`}
                             >
-                              <p className="whitespace-pre-wrap text-sm leading-6">
-                                {
-                                  item.message
-                                }
-                              </p>
-
-                              <time
-                                className={`mt-1 block text-[10px] ${
+                              <div
+                                className={`max-w-[82%] rounded-2xl px-4 py-3 ${
                                   isOwn
-                                    ? "text-right text-white/45"
-                                    : "text-[#173d32]/35"
+                                    ? "rounded-br-sm bg-[#173d32] text-white"
+                                    : "rounded-bl-sm border border-[#173d32]/10 bg-white"
                                 }`}
                               >
-                                {new Date(
-                                  item.created_at,
-                                ).toLocaleTimeString(
-                                  "en-PH",
+                                <p className="whitespace-pre-wrap text-sm leading-6">
                                   {
-                                    hour: "numeric",
-                                    minute:
-                                      "2-digit",
-                                  },
-                                )}
-                              </time>
+                                    item.message
+                                  }
+                                </p>
+
+                                <time
+                                  className={`mt-1 block text-[10px] ${
+                                    isOwn
+                                      ? "text-right text-white/45"
+                                      : "text-[#173d32]/35"
+                                  }`}
+                                >
+                                  {new Date(
+                                    item.created_at,
+                                  ).toLocaleTimeString(
+                                    "en-PH",
+                                    {
+                                      hour: "numeric",
+                                      minute:
+                                        "2-digit",
+                                    },
+                                  )}
+                                </time>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      },
-                    )}
+                          );
+                        },
+                      )}
 
-                    <div
-                      ref={
-                        messagesEndRef
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="border-t border-[#173d32]/10 bg-[#fbf8f1] p-3">
-                <div className="flex items-end gap-2">
-                  <textarea
-                    value={message}
-                    onChange={(event) =>
-                      setMessage(
-                        event.target
-                          .value,
-                      )
-                    }
-                    onKeyDown={
-                      handleKeyDown
-                    }
-                    rows={2}
-                    maxLength={2000}
-                    placeholder="Isulat ang mensahe..."
-                    className="min-h-[48px] flex-1 resize-none rounded-xl border border-[#173d32]/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#b76449]"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      void sendMessage()
-                    }
-                    disabled={
-                      loading ||
-                      !message.trim()
-                    }
-                    className="rounded-xl bg-[#b76449] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#9f503c] disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Send
-                  </button>
+                      <div
+                        ref={
+                          messagesEndRef
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
-              </div>
-            </>
-          )}
+
+                {/* Message input */}
+                <div className="border-t border-[#173d32]/10 bg-[#fbf8f1] p-3">
+                  <div className="flex items-end gap-2">
+                    <textarea
+                      value={message}
+                      onChange={(event) =>
+                        setMessage(
+                          event.target
+                            .value,
+                        )
+                      }
+                      onKeyDown={
+                        handleKeyDown
+                      }
+                      rows={2}
+                      maxLength={2000}
+                      placeholder="Isulat ang mensahe..."
+                      className="min-h-[48px] flex-1 resize-none rounded-xl border border-[#173d32]/15 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#b76449]"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void sendMessage()
+                      }
+                      disabled={
+                        loading ||
+                        !message.trim()
+                      }
+                      className="rounded-xl bg-[#b76449] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#9f503c] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
     </>
