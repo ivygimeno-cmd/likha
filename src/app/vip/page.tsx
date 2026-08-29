@@ -412,13 +412,12 @@ export default function VipPage() {
 
         {/* Back */}
   <div className="relative z-20 mt-14 border-t border-[#173d32]/10 pt-6">
-  <Link
-    href="/dashboard"
-    className="inline-flex items-center gap-2 text-sm font-semibold text-[#b76449] transition hover:text-[#9f503c]"
-  >
-    Mamaya na
-    <span aria-hidden="true">→</span>
-  </Link>
+ <Link
+  href="/dashboard"
+  className="inline-flex items-center text-sm font-semibold text-[#b76449] transition hover:text-[#9f503c]"
+>
+  Mamaya na
+</Link>
 </div>
       </div>
     </main>
