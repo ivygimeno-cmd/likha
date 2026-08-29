@@ -77,7 +77,7 @@ export default function BuyCreditsButton({
         }`}
       >
         {loading
-          ? "Opening PayMongo..."
+          ? "Inaayos ang payment.."
           : `Buy ${credits} Credits — ₱${price}`}
       </button>
 

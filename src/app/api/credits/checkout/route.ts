@@ -141,11 +141,9 @@ export async function POST(request: Request) {
                   },
                 ],
 
-                payment_method_types: [
-                  "gcash",
-                  "paymaya",
-                  "card",
-                ],
+               payment_method_types: [
+  "qrph",
+],
 
                 description:
                   `${bundle.credits} LIKHA Credits`,
