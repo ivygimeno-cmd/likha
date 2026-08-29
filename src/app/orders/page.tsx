@@ -103,9 +103,7 @@ const refundOrderIds = new Set(
 
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
         <section className="border-b border-[#173d32]/15 pb-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-            {isSeller ? "Seller workspace" : "Buyer workspace"}
-          </p>
+    
 
           <h1 className="mt-3 font-serif text-5xl font-semibold">
             Mga kasalukuyang order

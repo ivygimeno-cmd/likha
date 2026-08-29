@@ -295,11 +295,6 @@ export default function VipSupportChat({
                   LIKHA Support
                 </p>
 
-                <p className="mt-0.5 text-xs text-white/60">
-                  {isVip
-                    ? "Priority Support"
-                    : "VIP Support"}
-                </p>
               </div>
 
               <button

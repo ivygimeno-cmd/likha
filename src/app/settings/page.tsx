@@ -43,9 +43,7 @@ export default async function SettingsPage() {
       <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:py-20">
         {/* PAGE TITLE */}
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#b76449]">
-            Account
-          </p>
+        
 
           <h1 className="mt-4 font-serif text-5xl font-normal sm:text-6xl">
            Mga Setting
@@ -60,9 +58,7 @@ export default async function SettingsPage() {
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
           {/* ACCOUNT */}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-              Account
-            </p>
+          
 
             <h2 className="mt-3 font-serif text-3xl font-normal">
               Personal na impormasyon
@@ -128,9 +124,7 @@ export default async function SettingsPage() {
 
           {/* SECURITY */}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-          SEGURIDAD
-            </p>
+          
 
             <h2 className="mt-3 font-serif text-3xl font-normal">
             Password at seguridad
@@ -162,9 +156,7 @@ export default async function SettingsPage() {
 
           {/* NOTIFICATIONS */}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-              Notifications
-            </p>
+        
 
             <h2 className="mt-3 font-serif text-3xl font-normal">
               Email notifications
@@ -196,9 +188,7 @@ export default async function SettingsPage() {
 
           {/* ACCOUNT ACCESS */}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-              Account access
-            </p>
+       
 
             <h2 className="mt-3 font-serif text-3xl font-normal">
            Iyong session

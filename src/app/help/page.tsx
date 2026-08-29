@@ -536,9 +536,7 @@ export default async function HelpPage({
 
       <div className="mx-auto max-w-6xl px-6 py-14 sm:px-10 lg:py-20">
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#b76449]">
-            SUPORTA
-          </p>
+      
 
           <h1 className="mt-4 font-serif text-5xl font-normal sm:text-6xl">
             Tulong at Feedback
@@ -580,9 +578,7 @@ export default async function HelpPage({
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
             {!selectedCategory ? (
               <>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-                  MAKIPAG-UGNAYAN SA LIKHA
-                </p>
+              
 
                 <h2 className="mt-3 font-serif text-3xl font-normal">
                   Ano ang maitutulong namin?
@@ -817,9 +813,7 @@ export default async function HelpPage({
           </section>
 
           <aside className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-              IYONG MGA REQUEST
-            </p>
+        
 
             <h2 className="mt-3 font-serif text-3xl font-normal">
               History ng Support
