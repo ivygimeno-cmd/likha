@@ -107,9 +107,7 @@ export default async function NewSupportTicketPage({
       </header>
 
       <div className="mx-auto max-w-2xl px-6 py-14">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-          LIKHA Support
-        </p>
+   
 
         <h1 className="mt-3 font-serif text-5xl font-semibold">
           Submit a support ticket

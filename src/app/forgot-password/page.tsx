@@ -53,9 +53,7 @@ export default function ForgotPasswordPage() {
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
       <div className="mx-auto flex min-h-screen max-w-xl items-center px-6 py-12">
         <div className="w-full">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-            Account recovery
-          </p>
+       
 
           <h1 className="mt-3 font-serif text-5xl font-semibold">
             Nakalimutan ang password?

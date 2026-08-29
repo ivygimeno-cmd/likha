@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import RealtimeMessageThread from "./realtime-message-thread";
 import MessageComposer from "./message-composer";
+import AdminVipSupport from "@/app/components/admin-vip-support";
 
 type PageProps = {
   searchParams: Promise<{
@@ -39,6 +40,11 @@ export default async function MessagesPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const { data: adminCheck } =
+  await supabase.rpc("is_likha_admin");
+
+  const isAdmin = adminCheck === true;
 
   if (!user) {
     redirect("/login");
@@ -204,7 +210,9 @@ if (
             </div>
           </div>
         </section>
-      </div>
+         </div>
+
+      {isAdmin && <AdminVipSupport />}
     </main>
   );
 }
@@ -216,7 +224,7 @@ if (
   const conversations =
     (conversationData ?? []) as Conversation[];
 
-  const selectedConversation =
+  const selectedConversation =  
     conversations.find(
       (conversation) =>
         conversation.order_id === params.order,
@@ -694,9 +702,7 @@ async function acknowledgeWarning(formData: FormData) {
           
    <aside className="flex min-h-0 flex-col overflow-hidden border-b border-[#173d32]/15 lg:border-r lg:border-b-0">
     <div className="border-b border-[#173d32]/10 px-6 py-5">
-  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b76449]">
-    Likha Inbox
-  </p>
+ 
 
   <h1 className="mt-1 font-serif text-3xl font-semibold">
     Messages
@@ -973,9 +979,11 @@ async function acknowledgeWarning(formData: FormData) {
 )}
               </section>
             )}
-          </div>
+                 </div>
         )}
       </div>
+
+      {isAdmin && <AdminVipSupport />}
     </main>
   );
 }

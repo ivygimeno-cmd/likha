@@ -62,9 +62,7 @@ if (error) {
         </Link>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#d9c6a5]">
-            Maligayang pagbabalik
-          </p>
+        
 
           <h1 className="mt-5 max-w-xl font-serif text-6xl leading-tight font-semibold">
             Balikan ang mga ideyang nais mong malikha.
@@ -90,9 +88,7 @@ if (error) {
             LIKHA
           </Link>
 
-          <p className="mt-10 text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449] lg:mt-0">
-            Sign in
-          </p>
+    
 
           <h2 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
             Maligayang pagbabalik.

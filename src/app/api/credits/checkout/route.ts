@@ -2,6 +2,26 @@ import { NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
+const creditBundles = {
+  starter: {
+    credits: 50,
+    amount: 99,
+    name: "LIKHA Credits - Starter",
+  },
+  creator: {
+    credits: 120,
+    amount: 199,
+    name: "LIKHA Credits - Creator",
+  },
+  studio: {
+    credits: 300,
+    amount: 449,
+    name: "LIKHA Credits - Studio",
+  },
+} as const;
+
+type BundleCode = keyof typeof creditBundles;
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -19,15 +39,20 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
 
-    const requestedType =
-      body?.paymentType === "renewal"
-        ? "renewal"
-        : "initial";
+    const bundleCode = body?.bundleCode;
 
- const amount =
-  requestedType === "renewal"
-    ? 200
-    : 150;
+    if (
+      typeof bundleCode !== "string" ||
+      !(bundleCode in creditBundles)
+    ) {
+      return NextResponse.json(
+        { error: "Invalid credit bundle." },
+        { status: 400 },
+      );
+    }
+
+    const bundle =
+      creditBundles[bundleCode as BundleCode];
 
     const paymongoSecretKey =
       process.env.PAYMONGO_SECRET_KEY;
@@ -70,86 +95,20 @@ export async function POST(request: Request) {
         },
       );
 
-    /*
-     * Prevent another initial VIP purchase
-     * while the user is already VIP.
-     */
-    const { data: profile, error: profileError } =
-      await adminSupabase
-        .from("profiles")
-        .select(
-          "account_tier, vip_expires_at",
-        )
-        .eq("id", user.id)
-        .single();
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        {
-          error:
-            "Unable to load your VIP account status.",
-        },
-        { status: 500 },
-      );
-    }
-
-    const vipExpiresAt = profile.vip_expires_at
-      ? new Date(profile.vip_expires_at)
-      : null;
-
-    const currentlyVip =
-      profile.account_tier === "vip" &&
-      vipExpiresAt !== null &&
-      vipExpiresAt.getTime() > Date.now();
-
-    if (
-      requestedType === "initial" &&
-      currentlyVip
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "You already have an active VIP membership.",
-        },
-        { status: 409 },
-      );
-    }
-
-    /*
-     * Renewal is only available when the
-     * user is currently VIP or has previously
-     * had a VIP membership.
-     *
-     * We still allow renewal after expiry.
-     */
-    if (
-      requestedType === "renewal" &&
-      !profile.vip_expires_at
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Renewal is not available yet. Please purchase VIP first.",
-        },
-        { status: 400 },
-      );
-    }
-
-    const amountInCentavos =
-      amount * 100;
+    const transactionReference =
+      `CREDIT-${user.id}-${Date.now()}`;
 
     const origin =
       new URL(request.url).origin;
 
-    /*
-     * Create PayMongo Checkout Session.
-     */
+    const amountInCentavos =
+      bundle.amount * 100;
+
     const paymongoResponse =
       await fetch(
         "https://api.paymongo.com/v1/checkout_sessions",
         {
           method: "POST",
-
           headers: {
             Authorization:
               "Basic " +
@@ -176,10 +135,7 @@ export async function POST(request: Request) {
 
                     currency: "PHP",
 
-                    name:
-                      requestedType === "renewal"
-                        ? "LIKHA VIP Renewal"
-                        : "LIKHA VIP Membership",
+                    name: bundle.name,
 
                     quantity: 1,
                   },
@@ -192,18 +148,16 @@ export async function POST(request: Request) {
                 ],
 
                 description:
-                  requestedType === "renewal"
-                    ? "LIKHA VIP 30-day renewal"
-                    : "LIKHA VIP 30-day membership",
+                  `${bundle.credits} LIKHA Credits`,
 
                 success_url:
-                  `${origin}/vip?payment=success`,
+                  `${origin}/credits?payment=success`,
 
                 cancel_url:
-                  `${origin}/vip?payment=cancelled`,
+                  `${origin}/credits?payment=cancelled`,
 
                 reference_number:
-                  `VIP-${user.id}-${Date.now()}`,
+                  transactionReference,
 
                 send_email_receipt: false,
 
@@ -221,16 +175,15 @@ export async function POST(request: Request) {
 
     if (!paymongoResponse.ok) {
       console.error(
-        "PayMongo VIP checkout error:",
+        "PayMongo credits checkout error:",
         paymongoData,
       );
 
       return NextResponse.json(
         {
           error:
-            paymongoData?.errors?.[0]
-              ?.detail ??
-            "Unable to create VIP checkout.",
+            paymongoData?.errors?.[0]?.detail ??
+            "Unable to create credit checkout.",
         },
         {
           status:
@@ -246,58 +199,41 @@ export async function POST(request: Request) {
       paymongoData?.data?.attributes
         ?.checkout_url;
 
-    if (
-      !checkoutId ||
-      !checkoutUrl
-    ) {
+    if (!checkoutId || !checkoutUrl) {
       return NextResponse.json(
         {
           error:
-            "PayMongo did not return a valid VIP checkout session.",
+            "PayMongo did not return a valid checkout session.",
         },
         { status: 500 },
       );
     }
 
-    /*
-     * Save pending VIP payment.
-     *
-     * IMPORTANT:
-     * pending does NOT activate VIP.
-     * VIP will only activate after
-     * PayMongo confirms payment.
-     */
     const {
       error: paymentRecordError,
     } = await adminSupabase
-      .from("vip_payments")
+      .from("likha_credit_purchases")
       .insert({
         user_id: user.id,
-
-        amount,
-
-        payment_type:
-          requestedType,
-
+        bundle_code: bundleCode,
+        credits: bundle.credits,
+        amount: bundle.amount,
         status: "pending",
-
-        paymongo_checkout_id:
-          checkoutId,
-
+        paymongo_checkout_id: checkoutId,
         transaction_reference:
-          `VIP-${user.id}-${Date.now()}`,
+          transactionReference,
       });
 
     if (paymentRecordError) {
       console.error(
-        "VIP payment record error:",
+        "Credit purchase record error:",
         paymentRecordError,
       );
 
       return NextResponse.json(
         {
           error:
-            "Checkout was created, but LIKHA could not save the VIP payment record.",
+            "Checkout was created, but LIKHA could not save the purchase record.",
         },
         { status: 500 },
       );
@@ -308,14 +244,14 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error(
-      "VIP checkout route error:",
+      "Credits checkout route error:",
       error,
     );
 
     return NextResponse.json(
       {
         error:
-          "Unexpected error while creating VIP checkout.",
+          "Unexpected error while creating credit checkout.",
       },
       { status: 500 },
     );

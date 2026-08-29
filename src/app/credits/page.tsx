@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
-import TestPurchaseButton from "./test-purchase-button";
+import BuyCreditsButton from "./buy-credits-button";
 
 type CreditBalance = {
   balance: number | string;
@@ -57,6 +57,8 @@ export default async function CreditsPage() {
     (balanceData as CreditBalance | null)?.balance ?? 0,
   );
 
+
+
   const {
   data: transactionData,
   error: transactionError,
@@ -87,9 +89,7 @@ const transactions =
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10 lg:py-16">
         <section className="grid gap-8 border-b border-[#173d32]/15 pb-12 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-              LIKHA Credits
-            </p>
+          
 
             <h1 className="mt-3 max-w-3xl font-serif text-5xl leading-tight font-semibold sm:text-6xl">
               Mas maraming pagkakataong makahanap ng proyekto.
@@ -125,9 +125,7 @@ const transactions =
 
         <section className="py-12">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-              Credit bundles
-            </p>
+          
 
             <h2 className="mt-2 font-serif text-4xl font-semibold">
               Piliin ang bagay sa iyong paggawa.
@@ -174,21 +172,22 @@ const transactions =
                   <p className="mt-1 text-xs text-[#173d32]/45">
                     One-time credit purchase
                   </p>
-                </div>
-<TestPurchaseButton
+
+               <BuyCreditsButton
   bundleCode={bundle.code}
   credits={bundle.credits}
+  price={bundle.price}
   featured={bundle.featured === true}
 />
+                </div>
+
               </article>
             ))}
           </div>
         </section>
 
         <section className="border-t border-[#173d32]/15 py-12">
-  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-    Credit activity
-  </p>
+
 
   <h2 className="mt-2 font-serif text-4xl font-semibold">
     Transaction History
@@ -218,7 +217,7 @@ const transactions =
       </p>
     </div>
   ) : (
-    <div className="mt-8 overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
+   <div className="mt-8 max-h-[520px] overflow-y-auto rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
       {transactions.map((transaction) => (
         <article
           key={transaction.id}

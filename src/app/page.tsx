@@ -68,9 +68,7 @@ export default async function Home() {
 
       <section className="mx-auto grid min-h-[650px] max-w-7xl items-center gap-14 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:px-10">
         <div>
-          <p className="mb-6 text-sm font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-            Gawang lokal. Para sa iyo.
-          </p>
+       
 
           <h1 className="max-w-3xl font-serif text-6xl leading-[0.98] font-semibold tracking-tight sm:text-7xl lg:text-[86px]">
             May naiisip ka?
@@ -119,9 +117,7 @@ export default async function Home() {
           <div className="absolute -bottom-7 -right-5 h-40 w-40 bg-[#d9c6a5]" />
 
           <div className="relative overflow-hidden rounded-[2rem] bg-[#173d32] p-8 text-[#f5f0e6] shadow-2xl sm:p-12">
-            <p className="text-sm uppercase tracking-[0.2em] text-[#d9c6a5]">
-              Ipagawa Mo
-            </p>
+          
 
             <h2 className="mt-5 max-w-md font-serif text-4xl leading-tight font-semibold sm:text-5xl">
               Isang request. Maraming malikhaing posibilidad.
@@ -166,9 +162,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 flex items-end justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-                Tuklasin
-              </p>
+            
               <h2 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
                 Ano ang gusto mong ipagawa?
               </h2>
@@ -213,9 +207,7 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 border-b border-white/15 pb-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#d9c6a5]">
-                Paano Gumagana
-              </p>
+       
 
               <h2 className="mt-4 max-w-2xl font-serif text-5xl leading-tight font-semibold sm:text-6xl">
                 Mula idea hanggang
