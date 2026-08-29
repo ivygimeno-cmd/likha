@@ -304,7 +304,7 @@ export default function VipPage() {
 
 <Link
   href="/dashboard"
-  className="mt-5 inline-flex rounded-lg border border-[#b76449]/20 bg-[#b76449]/5 px-4 py-2 text-xs font-medium text-[#b76449]/80 transition hover:bg-[#b76449]/10 hover:text-[#b76449]"
+  className="mt-5 inline-flex min-w-[150px] justify-center rounded-lg border border-[#b76449]/20 bg-[#b76449]/5 px-5 py-2.5 text-sm font-medium text-[#b76449]/80 transition hover:bg-[#b76449]/10 hover:text-[#b76449]"
 >
   Mamaya na
 </Link>
