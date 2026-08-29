@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createClient } from "@/lib/supabase/client";
 
 type SupportMessage = {
@@ -25,19 +30,23 @@ export default function VipSupportChat({
   const [conversationId, setConversationId] =
     useState<number | null>(null);
 
-  const [messages, setMessages] = useState<SupportMessage[]>(
-    [],
-  );
+  const [messages, setMessages] =
+    useState<SupportMessage[]>([]);
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingMessages, setLoadingMessages] =
     useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef =
+    useRef<HTMLDivElement>(null);
 
   const supabase = createClient();
 
+  /*
+   * Load the VIP support conversation
+   * only when the chat is opened.
+   */
   useEffect(() => {
     if (!open || !isVip) {
       return;
@@ -46,11 +55,12 @@ export default function VipSupportChat({
     async function loadConversation() {
       setLoadingMessages(true);
 
-      const { data: conversation } = await supabase
-        .from("vip_support_conversations")
-        .select("id")
-        .eq("user_id", userId)
-        .maybeSingle();
+      const { data: conversation } =
+        await supabase
+          .from("vip_support_conversations")
+          .select("id")
+          .eq("user_id", userId)
+          .maybeSingle();
 
       if (!conversation) {
         setLoadingMessages(false);
@@ -59,18 +69,23 @@ export default function VipSupportChat({
 
       setConversationId(conversation.id);
 
-      const { data: existingMessages } = await supabase
-        .from("vip_support_messages")
-        .select(
-          "id, conversation_id, sender_id, sender_type, message, created_at",
-        )
-        .eq("conversation_id", conversation.id)
-        .order("created_at", {
-          ascending: true,
-        });
+      const { data: existingMessages } =
+        await supabase
+          .from("vip_support_messages")
+          .select(
+            "id, conversation_id, sender_id, sender_type, message, created_at",
+          )
+          .eq(
+            "conversation_id",
+            conversation.id,
+          )
+          .order("created_at", {
+            ascending: true,
+          });
 
       setMessages(
-        (existingMessages ?? []) as SupportMessage[],
+        (existingMessages ??
+          []) as SupportMessage[],
       );
 
       setLoadingMessages(false);
@@ -79,6 +94,9 @@ export default function VipSupportChat({
     void loadConversation();
   }, [open, isVip, userId]);
 
+  /*
+   * Realtime support messages.
+   */
   useEffect(() => {
     if (!conversationId) {
       return;
@@ -104,31 +122,88 @@ export default function VipSupportChat({
             if (
               current.some(
                 (item) =>
-                  item.id === newMessage.id,
+                  item.id ===
+                  newMessage.id,
               )
             ) {
               return current;
             }
 
-            return [...current, newMessage];
+            return [
+              ...current,
+              newMessage,
+            ];
           });
         },
       )
       .subscribe();
 
     return () => {
-      void supabase.removeChannel(channel);
+      void supabase.removeChannel(
+        channel,
+      );
     };
   }, [conversationId]);
 
+  /*
+   * Scroll to newest message.
+   */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
 
+  /*
+   * Close chat when clicking outside.
+   */
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function handleClickOutside(
+      event: MouseEvent,
+    ) {
+      const target =
+        event.target as Node;
+
+      const chatPanel =
+        document.getElementById(
+          "likha-vip-support-chat",
+        );
+
+      const chatButton =
+        document.getElementById(
+          "likha-support-button",
+        );
+
+      if (
+        chatPanel &&
+        !chatPanel.contains(target) &&
+        chatButton &&
+        !chatButton.contains(target)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+      );
+    };
+  }, [open]);
+
   async function sendMessage() {
-    const trimmedMessage = message.trim();
+    const trimmedMessage =
+      message.trim();
 
     if (!trimmedMessage || !isVip) {
       return;
@@ -140,16 +215,23 @@ export default function VipSupportChat({
       conversationId;
 
     if (!activeConversationId) {
-      const { data: newConversation, error } =
-        await supabase
-          .from("vip_support_conversations")
-          .insert({
-            user_id: userId,
-          })
-          .select("id")
-          .single();
+      const {
+        data: newConversation,
+        error,
+      } = await supabase
+        .from(
+          "vip_support_conversations",
+        )
+        .insert({
+          user_id: userId,
+        })
+        .select("id")
+        .single();
 
-      if (error || !newConversation) {
+      if (
+        error ||
+        !newConversation
+      ) {
         setLoading(false);
         return;
       }
@@ -162,15 +244,16 @@ export default function VipSupportChat({
       );
     }
 
-    const { error } = await supabase
-      .from("vip_support_messages")
-      .insert({
-        conversation_id:
-          activeConversationId,
-        sender_id: userId,
-        sender_type: "user",
-        message: trimmedMessage,
-      });
+    const { error } =
+      await supabase
+        .from("vip_support_messages")
+        .insert({
+          conversation_id:
+            activeConversationId,
+          sender_id: userId,
+          sender_type: "user",
+          message: trimmedMessage,
+        });
 
     if (!error) {
       setMessage("");
@@ -194,16 +277,22 @@ export default function VipSupportChat({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 rounded-full bg-[#173d32] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#245646]"
-      >
-        Talk to Support
-      </button>
+      {!open && (
+        <button
+          id="likha-support-button"
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-[#173d32] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#245646]"
+        >
+          Talk to Support
+        </button>
+      )}
 
       {open && (
-        <div className="fixed bottom-6 right-6 z-[60] flex h-[520px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl">
+        <div
+          id="likha-vip-support-chat"
+          className="fixed bottom-6 right-6 z-[60] flex h-[520px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl"
+        >
           <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
             <div>
               <p className="font-semibold">
@@ -219,7 +308,9 @@ export default function VipSupportChat({
 
             <button
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() =>
+                setOpen(false)
+              }
               className="text-xl text-white/60 hover:text-white"
               aria-label="Isara ang chat"
             >
@@ -234,8 +325,9 @@ export default function VipSupportChat({
               </p>
 
               <p className="mt-3 text-sm leading-6 text-[#173d32]/60">
-                Ang Priority Support ay para sa
-                LIKHA VIP members.
+                Ang Priority Support
+                ay para sa LIKHA VIP
+                members.
               </p>
 
               <a
@@ -251,17 +343,20 @@ export default function VipSupportChat({
                 {loadingMessages ? (
                   <div className="flex h-full items-center justify-center">
                     <p className="text-sm text-[#173d32]/45">
-                      Nilo-load ang conversation...
+                      Nilo-load ang
+                      conversation...
                     </p>
                   </div>
-                ) : messages.length === 0 ? (
+                ) : messages.length ===
+                  0 ? (
                   <div className="flex h-full flex-col items-center justify-center text-center">
                     <p className="font-serif text-2xl font-semibold">
                       Kumusta!
                     </p>
 
                     <p className="mt-2 text-sm leading-6 text-[#173d32]/55">
-                      Paano ka namin matutulungan?
+                      Paano ka namin
+                      matutulungan?
                     </p>
                   </div>
                 ) : (
@@ -274,7 +369,9 @@ export default function VipSupportChat({
 
                         return (
                           <div
-                            key={item.id}
+                            key={
+                              item.id
+                            }
                             className={`flex ${
                               isOwn
                                 ? "justify-end"
@@ -289,7 +386,9 @@ export default function VipSupportChat({
                               }`}
                             >
                               <p className="whitespace-pre-wrap text-sm leading-6">
-                                {item.message}
+                                {
+                                  item.message
+                                }
                               </p>
 
                               <time
@@ -316,7 +415,11 @@ export default function VipSupportChat({
                       },
                     )}
 
-                    <div ref={messagesEndRef} />
+                    <div
+                      ref={
+                        messagesEndRef
+                      }
+                    />
                   </div>
                 )}
               </div>
@@ -327,10 +430,13 @@ export default function VipSupportChat({
                     value={message}
                     onChange={(event) =>
                       setMessage(
-                        event.target.value,
+                        event.target
+                          .value,
                       )
                     }
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={
+                      handleKeyDown
+                    }
                     rows={2}
                     maxLength={2000}
                     placeholder="Isulat ang mensahe..."
