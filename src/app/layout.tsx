@@ -5,6 +5,7 @@ import SessionGuard from "@/app/components/session-guard";
 import PushNotificationSetup from "@/app/components/push-notification-setup";
 import { createClient } from "@/lib/supabase/server";
 import VipSupportChat from "@/app/components/vip-support-chat";
+
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -38,11 +39,18 @@ export default async function RootLayout({
   let isAdmin = false;
 
   if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("account_tier, vip_expires_at")
-      .eq("id", user.id)
-      .maybeSingle();
+    const [profileResult, adminResult] =
+      await Promise.all([
+        supabase
+          .from("profiles")
+          .select("account_tier, vip_expires_at")
+          .eq("id", user.id)
+          .maybeSingle(),
+
+        supabase.rpc("is_likha_admin"),
+      ]);
+
+    const profile = profileResult.data;
 
     if (
       profile?.account_tier === "vip" &&
@@ -52,14 +60,9 @@ export default async function RootLayout({
     ) {
       isVip = true;
     }
+
+    isAdmin = adminResult.data === true;
   }
-
-  if (user) {
-  const { data: adminCheck } =
-    await supabase.rpc("is_likha_admin");
-
-  isAdmin = adminCheck === true;
-}
 
   return (
     <html
@@ -70,19 +73,18 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${cormorant.variable} antialiased`}
       >
-<SessionGuard />
+        <SessionGuard />
 
-{isAdmin && <PushNotificationSetup />}
+        {isAdmin && <PushNotificationSetup />}
 
-{children}
+        {children}
 
-{user && (
-  <VipSupportChat
-    userId={user.id}
-    isVip={isVip}
-  />
-)}
-
+        {user && (
+          <VipSupportChat
+            userId={user.id}
+            isVip={isVip}
+          />
+        )}
       </body>
     </html>
   );
