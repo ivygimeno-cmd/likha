@@ -297,10 +297,17 @@ export default function VipPage() {
                 : "Mag-join sa VIP sa ₱150"}
             </button>
 
-            <p className="mt-4 max-w-md text-xs leading-5 text-[#173d32]/45">
-              One-time payment. Walang automatic
-              na recurring charge.
-            </p>
+        <p className="mt-4 max-w-md text-xs leading-5 text-[#173d32]/45">
+  One-time payment. Walang automatic
+  na recurring charge.
+</p>
+
+<Link
+  href="/dashboard"
+  className="mt-5 inline-flex rounded-lg border border-[#b76449]/20 bg-[#b76449]/5 px-4 py-2 text-xs font-medium text-[#b76449]/80 transition hover:bg-[#b76449]/10 hover:text-[#b76449]"
+>
+  Mamaya na
+</Link>
 
           </section>
 
@@ -410,15 +417,7 @@ export default function VipPage() {
 
         </div>
 
-        {/* Back */}
-  <div className="relative z-20 mt-14 border-t border-[#173d32]/10 pt-6">
- <Link
-  href="/dashboard"
-  className="inline-flex items-center text-sm font-semibold text-[#b76449] transition hover:text-[#9f503c]"
->
-  Mamaya na
-</Link>
-</div>
+   
       </div>
     </main>
   );
