@@ -5,6 +5,7 @@ import NotificationDropdown from "./notification-dropdown";
 import RealtimeNotificationRefresh from "./realtime-notification-refresh";
 import { refresh } from "next/cache";
 import GlobalSearch from "./global-search";
+import ProfileDropdown from "./profile-dropdown";
 
 export default async function AuthenticatedNavbar() {
   const supabase = await createClient();
@@ -17,27 +18,29 @@ export default async function AuthenticatedNavbar() {
     redirect("/login");
   }
 
-const [{ data: profile }, { data: notificationsData }] =
-  await Promise.all([
-    supabase
-      .from("profiles")
-      .select("role, full_name, business_name, avatar_url")
-      .eq("id", user.id)
-      .single(),
+  const [{ data: profile }, { data: notificationsData }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("role, full_name, business_name, avatar_url")
+        .eq("id", user.id)
+        .single(),
 
-    supabase
-      .from("notifications")
-      .select("id, type, title, message, href, read_at, created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(8),
-  ]);
+      supabase
+        .from("notifications")
+        .select(
+          "id, type, title, message, href, read_at, created_at",
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(8),
+    ]);
 
-const notifications = notificationsData ?? [];
+  const notifications = notificationsData ?? [];
 
-const unreadCount = notifications.filter(
-  (notification) => !notification.read_at,
-).length;
+  const unreadCount = notifications.filter(
+    (notification) => !notification.read_at,
+  ).length;
 
   const isSeller = profile?.role === "seller";
 
@@ -100,88 +103,89 @@ const unreadCount = notifications.filter(
     redirect("/login");
   }
 
+  async function openNotification(formData: FormData) {
+    "use server";
 
-async function openNotification(formData: FormData) {
-  "use server";
+    const supabase = await createClient();
 
-  const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    if (!user) {
+      redirect("/login");
+    }
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  const notificationId = String(
-    formData.get("notificationId") ?? "",
-  );
-
-  const href = String(
-    formData.get("href") ?? "/dashboard",
-  );
-
-  if (!notificationId) {
-    redirect("/dashboard");
-  }
-
-  const { error } = await supabase
-    .from("notifications")
-    .update({
-      read_at: new Date().toISOString(),
-    })
-    .eq("id", notificationId)
-    .eq("user_id", user.id);
-
-  if (error) {
-    throw new Error(
-      `Hindi ma-mark as read ang notification: ${error.message}`,
+    const notificationId = String(
+      formData.get("notificationId") ?? "",
     );
-  }
 
-  redirect(href);
-}
-async function dismissNotification(formData: FormData) {
-  "use server";
-
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const notificationId = String(
-    formData.get("notificationId") ?? "",
-  );
-
-  if (!notificationId) {
-    return;
-  }
-
-  const { error } = await supabase.rpc(
-    "dismiss_my_notification",
-    {
-      p_notification_id: notificationId,
-    },
-  );
-
-  if (error) {
-    throw new Error(
-      `Hindi ma-dismiss ang notification: ${error.message}`,
+    const href = String(
+      formData.get("href") ?? "/dashboard",
     );
+
+    if (!notificationId) {
+      redirect("/dashboard");
+    }
+
+    const { error } = await supabase
+      .from("notifications")
+      .update({
+        read_at: new Date().toISOString(),
+      })
+      .eq("id", notificationId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      throw new Error(
+        `Hindi ma-mark as read ang notification: ${error.message}`,
+      );
+    }
+
+    redirect(href);
   }
 
-  refresh();
-}
+  async function dismissNotification(formData: FormData) {
+    "use server";
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      redirect("/login");
+    }
+
+    const notificationId = String(
+      formData.get("notificationId") ?? "",
+    );
+
+    if (!notificationId) {
+      return;
+    }
+
+    const { error } = await supabase.rpc(
+      "dismiss_my_notification",
+      {
+        p_notification_id: notificationId,
+      },
+    );
+
+    if (error) {
+      throw new Error(
+        `Hindi ma-dismiss ang notification: ${error.message}`,
+      );
+    }
+
+    refresh();
+  }
 
   return (
-  <header className="border-b border-[#173d32]/15 bg-[#f5f0e6]">
-  <RealtimeNotificationRefresh userId={user.id} />
+    <header className="border-b border-[#173d32]/15 bg-[#f5f0e6]">
+      <RealtimeNotificationRefresh userId={user.id} />
+
       <nav className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-6 py-4 lg:px-10">
         <Link
           href="/"
@@ -189,6 +193,7 @@ async function dismissNotification(formData: FormData) {
         >
           LIKHA
         </Link>
+
         <GlobalSearch />
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -221,152 +226,159 @@ async function dismissNotification(formData: FormData) {
               />
             </svg>
           </Link>
-{/* Notifications */}
-<NotificationDropdown>
-  <summary
-    aria-label="Notifications"
-    title="Notifications"
-    className="relative flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-[#173d32]/15 transition hover:border-[#b76449]/40 hover:bg-[#b76449]/10 hover:text-[#b76449]"
-  >
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M18 8.25a6 6 0 0 0-12 0c0 7.5-3 7.5-3 7.5h18s-3 0-3-7.5Z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M10 19.5a2.25 2.25 0 0 0 4 0"
-      />
-    </svg>
 
-    {unreadCount > 0 && (
-      <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#b76449] px-1 text-[10px] font-bold text-white">
-        {unreadCount > 9 ? "9+" : unreadCount}
-      </span>
-    )}
-  </summary>
-
-  <div className="absolute right-0 z-50 mt-3 w-[360px] overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-xl">
-    {/* Header — NO X here */}
-    <div className="border-b border-[#173d32]/10 px-5 py-4">
-      <p className="font-semibold">
-        Notifications
-      </p>
-
-      <p className="mt-1 text-xs text-[#173d32]/45">
-        {unreadCount} unread
-      </p>
-    </div>
-
-    {/* Notification items */}
-    {notifications.length === 0 ? (
-      <div className="px-5 py-8 text-center">
-        <p className="text-sm text-[#173d32]/50">
-          No notifications yet.
-        </p>
-      </div>
-    ) : (
-      <div className="max-h-[420px] overflow-y-auto">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`flex items-start gap-3 border-b border-[#173d32]/10 px-5 py-4 ${
-              notification.read_at
-                ? "bg-transparent"
-                : "bg-[#173d32]/[0.035]"
-            }`}
-          >
-            {!notification.read_at && (
-              <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#b76449]" />
-            )}
-
-            {/* Click notification body */}
-            <form
-              action={openNotification}
-              className="min-w-0 flex-1"
+          {/* Notifications */}
+          <NotificationDropdown>
+            <summary
+              aria-label="Notifications"
+              title="Notifications"
+              className="relative flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-full border border-[#173d32]/15 transition hover:border-[#b76449]/40 hover:bg-[#b76449]/10 hover:text-[#b76449]"
             >
-              <input
-                type="hidden"
-                name="notificationId"
-                value={notification.id}
-              />
-
-              <input
-                type="hidden"
-                name="href"
-                value={notification.href ?? "/dashboard"}
-              />
-
-              <button
-                type="submit"
-                className="block w-full text-left"
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                className="h-5 w-5"
+                aria-hidden="true"
               >
-                <p className="text-sm font-semibold">
-                  {notification.title}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M18 8.25a6 6 0 0 0-12 0c0 7.5-3 7.5-3 7.5h18s-3 0-3-7.5Z"
+                />
+
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10 19.5a2.25 2.25 0 0 0 4 0"
+                />
+              </svg>
+
+              {unreadCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[#b76449] px-1 text-[10px] font-bold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </summary>
+
+            <div className="absolute right-0 z-50 mt-3 w-[360px] overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-xl">
+
+              {/* Header */}
+              <div className="border-b border-[#173d32]/10 px-5 py-4">
+                <p className="font-semibold">
+                  Notifications
                 </p>
 
-                <p className="mt-1 text-sm leading-6 text-[#173d32]/60">
-                  {notification.message}
+                <p className="mt-1 text-xs text-[#173d32]/45">
+                  {unreadCount} unread
                 </p>
+              </div>
 
-                <p className="mt-2 text-xs text-[#173d32]/40">
-                  {new Date(
-                    notification.created_at,
-                  ).toLocaleString("en-PH", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </button>
-            </form>
+              {/* Notification items */}
+              {notifications.length === 0 ? (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-sm text-[#173d32]/50">
+                    No notifications yet.
+                  </p>
+                </div>
+              ) : (
+                <div className="max-h-[420px] overflow-y-auto">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`flex items-start gap-3 border-b border-[#173d32]/10 px-5 py-4 ${
+                        notification.read_at
+                          ? "bg-transparent"
+                          : "bg-[#173d32]/[0.035]"
+                      }`}
+                    >
+                      {!notification.read_at && (
+                        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#b76449]" />
+                      )}
 
-            {/* X — dismiss THIS notification only */}
-            <form action={dismissNotification}>
-              <input
-                type="hidden"
-                name="notificationId"
-                value={notification.id}
-              />
+                      {/* Click notification body */}
+                      <form
+                        action={openNotification}
+                        className="min-w-0 flex-1"
+                      >
+                        <input
+                          type="hidden"
+                          name="notificationId"
+                          value={notification.id}
+                        />
 
-              <button
-                type="submit"
-                aria-label="Dismiss notification"
-                title="Dismiss notification"
-                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-lg text-[#173d32]/35 transition hover:bg-[#173d32]/5 hover:text-[#b76449]"
-              >
-                ×
-              </button>
-            </form>
-          </div>
-        ))}
-      </div>
-    )}
+                        <input
+                          type="hidden"
+                          name="href"
+                          value={
+                            notification.href ??
+                            "/dashboard"
+                          }
+                        />
 
-    {/* Footer */}
-    <div className="p-3">
-      <Link
-        href="/notifications"
-        className="flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-[#b76449] transition hover:bg-[#b76449]/10"
-      >
-        View all notifications 
-      </Link>
-    </div>
-  </div>
-</NotificationDropdown>
+                        <button
+                          type="submit"
+                          className="block w-full text-left"
+                        >
+                          <p className="text-sm font-semibold">
+                            {notification.title}
+                          </p>
+
+                          <p className="mt-1 text-sm leading-6 text-[#173d32]/60">
+                            {notification.message}
+                          </p>
+
+                          <p className="mt-2 text-xs text-[#173d32]/40">
+                            {new Date(
+                              notification.created_at,
+                            ).toLocaleString("en-PH", {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </button>
+                      </form>
+
+                      {/* Dismiss notification */}
+                      <form action={dismissNotification}>
+                        <input
+                          type="hidden"
+                          name="notificationId"
+                          value={notification.id}
+                        />
+
+                        <button
+                          type="submit"
+                          aria-label="Dismiss notification"
+                          title="Dismiss notification"
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-lg text-[#173d32]/35 transition hover:bg-[#173d32]/5 hover:text-[#b76449]"
+                        >
+                          ×
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="p-3">
+                <Link
+                  href="/notifications"
+                  className="flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-[#b76449] transition hover:bg-[#b76449]/10"
+                >
+                  View all notifications
+                </Link>
+              </div>
+            </div>
+          </NotificationDropdown>
+
           {/* Profile dropdown */}
-    <details className="relative">
+          <ProfileDropdown>
             <summary className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-[#173d32]/15 bg-[#fbf8f1] py-1.5 pr-4 pl-1.5 transition hover:border-[#173d32]/30">
               <div
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#173d32] bg-cover bg-center font-serif text-sm font-semibold text-white"
@@ -409,6 +421,8 @@ async function dismissNotification(formData: FormData) {
             </summary>
 
             <div className="absolute right-0 z-50 mt-3 w-72 overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-xl">
+
+              {/* Profile header */}
               <div className="border-b border-[#173d32]/10 px-5 py-4">
                 <p className="truncate font-semibold">
                   {displayName}
@@ -425,33 +439,37 @@ async function dismissNotification(formData: FormData) {
                 </p>
               </div>
 
+              {/* Menu */}
               <div className="flex flex-col p-2">
+
                 <Link
                   href={`/profile/${user.id}`}
                   className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
                 >
                   View Profile
                 </Link>
-<Link
-  href="/dashboard"
-  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
->
-  Dashboard
-</Link>
 
-<Link
-  href="/marketplace"
-  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
->
-  Marketplace
-</Link>
+                <Link
+                  href="/dashboard"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
+                >
+                  Dashboard
+                </Link>
 
-<Link
-  href="/orders"
-  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
->
-  Orders
-</Link>
+                <Link
+                  href="/marketplace"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
+                >
+                  Marketplace
+                </Link>
+
+                <Link
+                  href="/orders"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
+                >
+                  Orders
+                </Link>
+
                 <Link
                   href="/messages"
                   className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5 sm:hidden"
@@ -470,28 +488,25 @@ async function dismissNotification(formData: FormData) {
                       ? "Switch to Buyer"
                       : "Switch to Seller"}
                   </button>
-</form>
+                </form>
 
-<div className="my-2 border-t border-[#173d32]/10" />
+                <div className="my-2 border-t border-[#173d32]/10" />
 
-<Link
-  href="/settings"
-  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
->
-  Settings
-</Link>
+                <Link
+                  href="/settings"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
+                >
+                  Settings
+                </Link>
 
+                <Link
+                  href="/help"
+                  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
+                >
+                  Help & Feedback
+                </Link>
 
-<Link
-  href="/help"
-  className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
->
-  Help & Feedback
-</Link>
-
-
-
-<form action={signOut}>
+                <form action={signOut}>
                   <button
                     type="submit"
                     className="w-full rounded-xl px-4 py-3 text-left text-sm font-semibold transition hover:bg-red-50 hover:text-red-700"
@@ -499,9 +514,11 @@ async function dismissNotification(formData: FormData) {
                     Sign out
                   </button>
                 </form>
+
               </div>
             </div>
-</details>
+          </ProfileDropdown>
+
         </div>
       </nav>
     </header>

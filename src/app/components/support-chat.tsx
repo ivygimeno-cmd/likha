@@ -1,7 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 type SupportChatProps = {
   isVip: boolean;
@@ -12,19 +16,52 @@ export default function SupportChat({
 }: SupportChatProps) {
   const [open, setOpen] = useState(false);
 
+  const chatRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+
+      if (
+        open &&
+        chatRef.current &&
+        !chatRef.current.contains(target)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside,
+    );
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside,
+      );
+    };
+  }, [open]);
+
   return (
     <>
       {/* Floating button */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 rounded-full bg-[#173d32] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#245646]"
-      >
-        Talk to Support
-      </button>
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-6 right-6 z-50 rounded-full bg-[#173d32] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#245646]"
+        >
+          Talk to Support
+        </button>
+      )}
 
       {open && (
-        <div className="fixed bottom-6 right-6 z-[60] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl">
+        <div
+          ref={chatRef}
+          className="fixed bottom-6 right-6 z-[60] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl"
+        >
           {/* Header */}
           <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
             <div>
