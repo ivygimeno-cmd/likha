@@ -47,9 +47,10 @@ export default function SessionGuard() {
         return;
       }
 
-      const { data, error } = await supabase.rpc(
-        "is_my_current_session_active",
-      );
+      const { data, error } =
+        await supabase.rpc(
+          "is_my_current_session_active",
+        );
 
       if (cancelled) {
         return;
@@ -68,6 +69,10 @@ export default function SessionGuard() {
           scope: "local",
         });
 
+        if (cancelled) {
+          return;
+        }
+
         router.replace(
           "/login?session_revoked=1",
         );
@@ -78,14 +83,26 @@ export default function SessionGuard() {
 
     void checkSession();
 
-    const interval = window.setInterval(
-      checkSession,
-      5000,
+    function handleVisibilityChange() {
+      if (
+        document.visibilityState === "visible"
+      ) {
+        void checkSession();
+      }
+    }
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
     );
 
     return () => {
       cancelled = true;
-      window.clearInterval(interval);
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
     };
   }, [pathname, router, supabase]);
 
