@@ -195,9 +195,6 @@ export default function VipPage() {
         {/* Header */}
         <div className="max-w-3xl">
 
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-            LIKHA VIP
-          </p>
 
           <h1 className="mt-4 max-w-2xl font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
             Mas maraming pagkakataon para
@@ -310,9 +307,6 @@ export default function VipPage() {
           {/* Benefits */}
           <section className="border-t border-[#173d32]/15 pt-7">
 
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b76449]">
-              Mga benepisyo
-            </p>
 
             <h2 className="mt-4 max-w-lg font-serif text-3xl leading-tight sm:text-4xl">
               Mas maraming paraan para
@@ -417,17 +411,15 @@ export default function VipPage() {
         </div>
 
         {/* Back */}
-        <div className="mt-14 border-t border-[#173d32]/10 pt-6">
-
-          <Link
-            href="/dashboard"
-            className="text-sm font-semibold text-[#b76449] transition hover:text-[#9f503c]"
-          >
-            Mamaya na
-          </Link>
-
-        </div>
-
+  <div className="relative z-20 mt-14 border-t border-[#173d32]/10 pt-6">
+  <Link
+    href="/dashboard"
+    className="inline-flex items-center gap-2 text-sm font-semibold text-[#b76449] transition hover:text-[#9f503c]"
+  >
+    Mamaya na
+    <span aria-hidden="true">→</span>
+  </Link>
+</div>
       </div>
     </main>
   );
