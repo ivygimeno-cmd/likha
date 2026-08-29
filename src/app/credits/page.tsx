@@ -7,6 +7,14 @@ type CreditBalance = {
   balance: number | string;
 };
 
+type CreditTransaction = {
+  id: number;
+  amount: number;
+  entry_type: string;
+  description: string | null;
+  created_at: string;
+};
+
 const creditBundles = [
   {
     code: "starter",
@@ -46,41 +54,31 @@ export default async function CreditsPage() {
     redirect("/login");
   }
 
-  const {
-    data: balanceData,
-    error: balanceError,
-  } = await supabase
-    .rpc("get_my_likha_credit_balance")
-    .maybeSingle();
+  const [
+    { data: balanceData, error: balanceError },
+    { data: transactionData, error: transactionError },
+  ] = await Promise.all([
+    supabase
+      .rpc("get_my_likha_credit_balance")
+      .maybeSingle(),
+
+    supabase
+      .from("likha_credit_ledger")
+      .select(
+        "id, amount, entry_type, description, created_at",
+      )
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(20),
+  ]);
 
   const creditBalance = Number(
     (balanceData as CreditBalance | null)?.balance ?? 0,
   );
 
-
-
-  const {
-  data: transactionData,
-  error: transactionError,
-} = await supabase
-  .from("likha_credit_ledger")
-  .select(
-    "id, amount, entry_type, description, created_at",
-  )
-  .order("created_at", { ascending: false })
-  .limit(20);
-
-const transactions =
-  (transactionData ?? []) as CreditTransaction[];
-
-  type CreditTransaction = {
-  id: number;
-  amount: number;
-  entry_type: string;
-  description: string | null;
-  created_at: string;
-};
-
+  const transactions =
+    (transactionData ?? []) as CreditTransaction[];
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
@@ -89,9 +87,7 @@ const transactions =
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10 lg:py-16">
         <section className="grid gap-8 border-b border-[#173d32]/15 pb-12 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-          
-
-            <h1 className="mt-3 max-w-3xl font-serif text-5xl leading-tight font-semibold sm:text-6xl">
+            <h1 className="mt-3 max-w-3xl font-serif text-5xl font-semibold leading-tight sm:text-6xl">
               Mas maraming pagkakataong makahanap ng proyekto.
             </h1>
 
@@ -125,8 +121,6 @@ const transactions =
 
         <section className="py-12">
           <div>
-          
-
             <h2 className="mt-2 font-serif text-4xl font-semibold">
               Piliin ang bagay sa iyong paggawa.
             </h2>
@@ -173,97 +167,94 @@ const transactions =
                     One-time credit purchase
                   </p>
 
-               <BuyCreditsButton
-  bundleCode={bundle.code}
-  credits={bundle.credits}
-  price={bundle.price}
-  featured={bundle.featured === true}
-/>
+                  <BuyCreditsButton
+                    bundleCode={bundle.code}
+                    credits={bundle.credits}
+                    price={bundle.price}
+                    featured={bundle.featured === true}
+                  />
                 </div>
-
               </article>
             ))}
           </div>
         </section>
 
         <section className="border-t border-[#173d32]/15 py-12">
+          <h2 className="mt-2 font-serif text-4xl font-semibold">
+            Transaction History
+          </h2>
 
-
-  <h2 className="mt-2 font-serif text-4xl font-semibold">
-    Transaction History
-  </h2>
-
-  <p className="mt-3 text-[#173d32]/60">
-    Makikita rito ang binili, natanggap, ginamit, at
-    na-refund na LIKHA Credits.
-  </p>
-
-  {transactionError && (
-    <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-      Hindi makuha ang transaction history:{" "}
-      {transactionError.message}
-    </p>
-  )}
-
-  {!transactionError && transactions.length === 0 ? (
-    <div className="mt-8 rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] p-8 text-center">
-      <p className="font-serif text-2xl font-semibold">
-        Wala pang credit activity.
-      </p>
-
-      <p className="mt-2 text-sm text-[#173d32]/55">
-        Lalabas dito ang iyong purchases at paggamit ng
-        credits.
-      </p>
-    </div>
-  ) : (
-   <div className="mt-8 max-h-[520px] overflow-y-auto rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
-      {transactions.map((transaction) => (
-        <article
-          key={transaction.id}
-          className="flex flex-col justify-between gap-4 border-b border-[#173d32]/10 px-6 py-5 last:border-b-0 sm:flex-row sm:items-center"
-        >
-          <div>
-            <p className="font-semibold">
-              {transaction.description ??
-                "LIKHA Credits activity"}
-            </p>
-
-            <p className="mt-1 text-sm capitalize text-[#173d32]/50">
-              {transaction.entry_type.replaceAll("_", " ")}
-            </p>
-
-            <time className="mt-1 block text-xs text-[#173d32]/45">
-              {new Date(
-                transaction.created_at,
-              ).toLocaleString("en-PH", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
-            </time>
-          </div>
-
-          <p
-            className={`font-serif text-3xl font-semibold ${
-              transaction.amount > 0
-                ? "text-[#173d32]"
-                : "text-[#b76449]"
-            }`}
-          >
-            {transaction.amount > 0 ? "+" : ""}
-            {transaction.amount.toLocaleString("en-PH")}
-            <span className="ml-2 font-sans text-sm font-normal text-[#173d32]/50">
-              credits
-            </span>
+          <p className="mt-3 text-[#173d32]/60">
+            Makikita rito ang binili, natanggap, ginamit, at
+            na-refund na LIKHA Credits.
           </p>
-        </article>
-      ))}
-    </div>
-  )}
-</section>
+
+          {transactionError && (
+            <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              Hindi makuha ang transaction history:{" "}
+              {transactionError.message}
+            </p>
+          )}
+
+          {!transactionError && transactions.length === 0 ? (
+            <div className="mt-8 rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] p-8 text-center">
+              <p className="font-serif text-2xl font-semibold">
+                Wala pang credit activity.
+              </p>
+
+              <p className="mt-2 text-sm text-[#173d32]/55">
+                Lalabas dito ang iyong purchases at paggamit ng
+                credits.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-8 max-h-[520px] overflow-y-auto rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
+              {transactions.map((transaction) => (
+                <article
+                  key={transaction.id}
+                  className="flex flex-col justify-between gap-4 border-b border-[#173d32]/10 px-6 py-5 last:border-b-0 sm:flex-row sm:items-center"
+                >
+                  <div>
+                    <p className="font-semibold">
+                      {transaction.description ??
+                        "LIKHA Credits activity"}
+                    </p>
+
+                    <p className="mt-1 text-sm capitalize text-[#173d32]/50">
+                      {transaction.entry_type.replaceAll("_", " ")}
+                    </p>
+
+                    <time className="mt-1 block text-xs text-[#173d32]/45">
+                      {new Date(
+                        transaction.created_at,
+                      ).toLocaleString("en-PH", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </time>
+                  </div>
+
+                  <p
+                    className={`font-serif text-3xl font-semibold ${
+                      transaction.amount > 0
+                        ? "text-[#173d32]"
+                        : "text-[#b76449]"
+                    }`}
+                  >
+                    {transaction.amount > 0 ? "+" : ""}
+                    {transaction.amount.toLocaleString("en-PH")}
+                    <span className="ml-2 font-sans text-sm font-normal text-[#173d32]/50">
+                      credits
+                    </span>
+                  </p>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className="grid gap-8 rounded-3xl bg-[#e9e1d2] p-8 lg:grid-cols-3 lg:p-10">
           <div>
