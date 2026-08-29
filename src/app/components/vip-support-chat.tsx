@@ -45,6 +45,35 @@ export default function VipSupportChat({
 
   const supabase = createClient();
 
+  useEffect(() => {
+  if (!open) return;
+
+  const handleOutsideClick = (event: MouseEvent) => {
+    const target = event.target as Node;
+    const chat = document.getElementById(
+      "likha-vip-support-chat"
+    );
+
+    if (chat && !chat.contains(target)) {
+      setOpen(false);
+    }
+  };
+
+  document.addEventListener(
+    "click",
+    handleOutsideClick,
+    true
+  );
+
+  return () => {
+    document.removeEventListener(
+      "click",
+      handleOutsideClick,
+      true
+    );
+  };
+}, [open]);
+
   /*
    * Load the VIP support conversation
    * only when the chat is opened.
@@ -251,10 +280,7 @@ export default function VipSupportChat({
       )}
 
       {open && (
-        <div
-          className="fixed inset-0 z-[59]"
-          onClick={() => setOpen(false)}
-        >
+     
           <div
             id="likha-vip-support-chat"
             onClick={(event) =>
@@ -437,7 +463,7 @@ export default function VipSupportChat({
               </>
             )}
           </div>
-        </div>
+        
       )}
     </>
   );
