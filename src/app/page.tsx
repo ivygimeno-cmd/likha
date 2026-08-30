@@ -83,21 +83,7 @@ export default async function Home() {
             personalized gifts at business packaging.
           </p>
 
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-            <Link
-  href={user ? "/request" : "/login"}
-  className="rounded-md bg-[#b76449] px-8 py-4 text-center font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#9f503c]"
->
-  Magpagawa 
-</Link>
-
-<Link
-  href={user ? "/marketplace" : "/login"}
-  className="rounded-md border border-[#173d32] px-8 py-4 text-center font-semibold transition hover:bg-[#173d32] hover:text-white"
->
-  Maghanap ng Proyekto 
-</Link>
-          </div>
+        
 
           <div className="mt-14 flex gap-10 border-t border-[#173d32]/15 pt-7">
             <div>

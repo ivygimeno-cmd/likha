@@ -241,9 +241,7 @@ export default function TermsPage() {
       </header>
 
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-10 lg:py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#b76449]">
-          Legal
-        </p>
+        
 
         <h1 className="mt-4 font-serif text-5xl font-semibold sm:text-6xl">
           Terms and Conditions
