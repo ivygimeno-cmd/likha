@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
@@ -14,19 +15,13 @@ const allowedTypes = [
 export default async function VerifiedNameSettingsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+ const currentUser = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+if (!currentUser) {
+  redirect("/login");
+}
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", user.id)
-    .maybeSingle();
+const { user, profile } = currentUser;
 
   const { data: pendingRequest } = await supabase
     .from("account_change_requests")

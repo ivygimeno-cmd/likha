@@ -1,45 +1,26 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import AvatarUpload from "./avatar-upload";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
+ const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+const currentUser = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+if (!currentUser) {
+  redirect("/login");
+}
 
-   const [
-    { data: isAdmin, error: adminAccessError },
-    { data: profile },
-    { data: verificationData },
-  ] = await Promise.all([
-    supabase.rpc("is_likha_admin"),
+const { user, profile, isAdmin } = currentUser;
 
-    supabase
-      .from("profiles")
-      .select("full_name, role, business_name, avatar_url")
-      .eq("id", user.id)
-      .single(),
-
-    supabase
-      .rpc("get_public_identity_verification", {
-        p_profile_id: user.id,
-      })
-      .maybeSingle(),
-  ]);
-
-  if (adminAccessError) {
-    throw new Error(
-      `Hindi ma-check ang admin access: ${adminAccessError.message}`,
-    );
-  }
+const { data: verificationData } = await supabase
+  .rpc("get_public_identity_verification", {
+    p_profile_id: user.id,
+  })
+  .maybeSingle();
 
   const verification = verificationData as {
     is_verified: boolean;

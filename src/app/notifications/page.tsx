@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 type NotificationRecord = {
   id: string;
@@ -48,13 +49,13 @@ export default async function NotificationsPage() {
 
     const supabase = await createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const currentUser = await getCurrentUser();
 
-    if (!user) {
-      redirect("/login");
-    }
+if (!currentUser) {
+  redirect("/login");
+}
+
+const { user } = currentUser;
 
     const { error } = await supabase.rpc(
       "dismiss_all_my_notifications",

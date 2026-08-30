@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 import BuyCreditsButton from "./buy-credits-button";
+import { getCurrentUser } from "@/lib/current-user";
 
 type CreditBalance = {
   balance: number | string;
@@ -46,13 +47,13 @@ const creditBundles = [
 export default async function CreditsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+if (!currentUser) {
+  redirect("/login");
+}
+
+const { user } = currentUser;
 
   const [
     { data: balanceData, error: balanceError },

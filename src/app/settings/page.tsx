@@ -1,23 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+if (!currentUser) {
+  redirect("/login");
+}
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name, contact_number")
-    .eq("id", user.id)
-    .maybeSingle();
+const { user, profile } = currentUser;
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">

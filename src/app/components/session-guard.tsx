@@ -104,7 +104,7 @@ export default function SessionGuard() {
         handleVisibilityChange,
       );
     };
-  }, [pathname, router, supabase]);
+}, [router, supabase]);
 
   return null;
 }

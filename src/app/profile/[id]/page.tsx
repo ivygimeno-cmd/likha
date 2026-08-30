@@ -63,6 +63,15 @@ type VipProfile = {
   vip_expires_at: string | null;
 };
 
+type ProfileBadgeInfo = {
+  created_at: string;
+  account_tier: "standard" | "vip" | string | null;
+};
+
+type AdminBadgeProfile = {
+  is_admin_badge: boolean | null;
+};
+
 const rarityOrder: Record<string, number> = {
   Mythic: 1,
   Legendary: 2,
@@ -86,6 +95,9 @@ export default async function PublicProfilePage({
     redirect("/login");
   }
 
+  /*
+   * PUBLIC PROFILE
+   */
   const { data: profileData } = await supabase
     .rpc("get_public_profile", {
       p_profile_id: id,
@@ -98,6 +110,9 @@ export default async function PublicProfilePage({
     notFound();
   }
 
+  /*
+   * LOAD PROFILE DATA
+   */
   const [
     { data: avatarData },
     { data: ratingData },
@@ -113,37 +128,59 @@ export default async function PublicProfilePage({
     { count: purchasedProjects },
     { data: creditBalanceData },
     { data: vipProfileData },
+    { data: adminBadgeData },
   ] = await Promise.all([
+    /*
+     * Avatar
+     */
     supabase.rpc("get_public_avatar", {
       p_profile_id: id,
     }),
 
+    /*
+     * Rating
+     */
     supabase
       .rpc("get_profile_rating", {
         p_profile_id: id,
       })
       .maybeSingle(),
 
+    /*
+     * Identity verification
+     */
     supabase
       .rpc("get_public_identity_verification", {
         p_profile_id: id,
       })
       .maybeSingle(),
 
+    /*
+     * Reviews
+     */
     supabase.rpc("get_profile_reviews", {
       p_profile_id: id,
     }),
 
+    /*
+     * Existing badge/profile information
+     */
     supabase
       .rpc("get_public_profile_badges", {
         p_profile_id: id,
       })
       .maybeSingle(),
 
+    /*
+     * Earned badges
+     */
     supabase.rpc("get_public_profile_badges", {
       p_profile_id: id,
     }),
 
+    /*
+     * Portfolio projects
+     */
     supabase
       .from("portfolio_projects")
       .select(
@@ -154,12 +191,18 @@ export default async function PublicProfilePage({
         ascending: false,
       }),
 
+    /*
+     * Featured projects
+     */
     supabase
       .from("featured_projects")
       .select("project_id")
       .eq("profile_id", id)
       .eq("is_active", true),
 
+    /*
+     * Followers
+     */
     supabase
       .from("follows")
       .select("*", {
@@ -168,6 +211,9 @@ export default async function PublicProfilePage({
       })
       .eq("following_id", id),
 
+    /*
+     * Following
+     */
     supabase
       .from("follows")
       .select("*", {
@@ -176,6 +222,9 @@ export default async function PublicProfilePage({
       })
       .eq("follower_id", id),
 
+    /*
+     * Completed seller projects
+     */
     supabase
       .from("orders")
       .select("*", {
@@ -185,6 +234,9 @@ export default async function PublicProfilePage({
       .eq("seller_id", id)
       .eq("status", "completed"),
 
+    /*
+     * Purchased projects
+     */
     supabase
       .from("orders")
       .select("*", {
@@ -194,6 +246,9 @@ export default async function PublicProfilePage({
       .eq("buyer_id", id)
       .eq("status", "completed"),
 
+    /*
+     * Credits — own profile only
+     */
     user.id === id
       ? supabase
           .rpc("get_my_likha_credit_balance")
@@ -203,9 +258,24 @@ export default async function PublicProfilePage({
           error: null,
         }),
 
+    /*
+     * VIP
+     */
     supabase
       .from("profiles")
       .select("account_tier, vip_expires_at")
+      .eq("id", id)
+      .maybeSingle(),
+
+    /*
+     * ADMIN BADGE
+     *
+     * IMPORTANT:
+     * We read is_admin_badge directly from profiles.
+     */
+    supabase
+      .from("profiles")
+      .select("is_admin_badge")
       .eq("id", id)
       .maybeSingle(),
   ]);
@@ -224,15 +294,39 @@ export default async function PublicProfilePage({
   const reviews =
     (reviewData ?? []) as ProfileReview[];
 
-  const profileBadges = profileBadgesData as {
-    created_at: string;
-    account_tier: "standard" | "vip";
-    is_admin_badge: boolean;
-  } | null;
+  const profileBadges =
+    profileBadgesData as ProfileBadgeInfo | null;
 
   const vipProfile =
     vipProfileData as VipProfile | null;
 
+  /*
+   * ADMIN BADGE
+   *
+   * This now comes directly from:
+   * profiles.is_admin_badge
+   */
+  const adminBadge =
+    adminBadgeData as AdminBadgeProfile | null;
+
+  const hasAdminBadge =
+    adminBadge?.is_admin_badge === true;
+
+  /*
+   * EARNED BADGES
+   */
+  const earnedBadges =
+    (earnedBadgesData ?? []) as EarnedBadge[];
+
+  const visibleBadges =
+    earnedBadges.slice(0, 6);
+
+  const hasMoreBadges =
+    earnedBadges.length > 6;
+
+  /*
+   * ACCOUNT AGE
+   */
   const profileCreatedAt =
     profileBadges?.created_at
       ? new Date(profileBadges.created_at)
@@ -283,6 +377,9 @@ export default async function PublicProfilePage({
             }m old`;
   }
 
+  /*
+   * VIP
+   */
   const isVip =
     vipProfile?.account_tier === "vip" &&
     vipProfile?.vip_expires_at !== null &&
@@ -290,18 +387,9 @@ export default async function PublicProfilePage({
       vipProfile.vip_expires_at,
     ).getTime() > Date.now();
 
-  const hasAdminBadge =
-    profileBadges?.is_admin_badge === true;
-
-  const earnedBadges =
-    (earnedBadgesData ?? []) as EarnedBadge[];
-
-  const visibleBadges =
-    earnedBadges.slice(0, 6);
-
-  const hasMoreBadges =
-    earnedBadges.length > 6;
-
+  /*
+   * PROJECTS
+   */
   const projects = (
     (projectData ?? []) as PortfolioProject[]
   ).map((project) => {
@@ -320,6 +408,9 @@ export default async function PublicProfilePage({
     };
   });
 
+  /*
+   * FEATURED PROJECTS
+   */
   const featuredProjectIds =
     new Set(
       (featuredProjectData ?? []).map(
@@ -327,6 +418,9 @@ export default async function PublicProfilePage({
       ),
     );
 
+  /*
+   * RATINGS
+   */
   const averageRating = Number(
     rating?.average_rating ?? 0,
   );
@@ -343,15 +437,24 @@ export default async function PublicProfilePage({
     ),
   );
 
+  /*
+   * AVATAR INITIAL
+   */
   const avatarInitial =
     profile.display_name
       .trim()
       .charAt(0)
       .toUpperCase() || "L";
 
+  /*
+   * OWN PROFILE
+   */
   const isOwnProfile =
     user.id === profile.id;
 
+  /*
+   * CREDITS
+   */
   let creditBalance = 0;
 
   if (isOwnProfile) {
@@ -416,6 +519,7 @@ export default async function PublicProfilePage({
                         <span aria-hidden="true">
                           ✓
                         </span>
+
                         Identity Verified
                       </span>
                     )}
@@ -455,21 +559,24 @@ export default async function PublicProfilePage({
                       </span>
                     )}
 
-            {isVip && (
-  <span
-    title="VIP member — priority service and dedicated LIKHA support."
-    className="inline-flex items-center gap-2 rounded-full border border-[#b38a3e]/60 bg-[#173d32] px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-[#f3dfad] shadow-[0_2px_8px_rgba(23,61,50,0.12)]"
-  >
-    <span
-      aria-hidden="true"
-      className="flex h-5 w-5 items-center justify-center rounded-full border border-[#e4c36a]/70 bg-[#0f2f27] text-[15px] leading-none text-[#e4c36a]"
-    >
-      ♝
-    </span>
+                    {isVip && (
+                      <span
+                        title="VIP member — priority service and dedicated LIKHA support."
+                        className="inline-flex items-center gap-2 rounded-full border border-[#b38a3e]/60 bg-[#173d32] px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-[#f3dfad] shadow-[0_2px_8px_rgba(23,61,50,0.12)]"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className="flex h-5 w-5 items-center justify-center rounded-full border border-[#e4c36a]/70 bg-[#0f2f27] text-[15px] leading-none text-[#e4c36a]"
+                        >
+                          ♝
+                        </span>
 
-    <span>VIP</span>
-  </span>
-)}
+                        <span>
+                          VIP
+                        </span>
+                      </span>
+                    )}
+
                     {hasAdminBadge && (
                       <span
                         title="Official LIKHA administrator."
@@ -478,6 +585,7 @@ export default async function PublicProfilePage({
                         <span aria-hidden="true">
                           ♛
                         </span>
+
                         LIKHA ADMIN
                       </span>
                     )}
@@ -490,8 +598,7 @@ export default async function PublicProfilePage({
                           {followerCount ?? 0}
                         </span>{" "}
                         <span className="text-[#173d32]/55">
-                          {followerCount ===
-                          1
+                          {followerCount === 1
                             ? "Follower"
                             : "Followers"}
                         </span>
@@ -538,8 +645,7 @@ export default async function PublicProfilePage({
 
                       <span className="ml-2 font-normal text-[#173d32]/55">
                         ({totalReviews}{" "}
-                        {totalReviews ===
-                        1
+                        {totalReviews === 1
                           ? "review"
                           : "reviews"}
                         )
@@ -583,7 +689,7 @@ export default async function PublicProfilePage({
                 <div className="mt-6 ml-6 flex flex-wrap items-center gap-4">
                   <div className="min-w-36 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-5 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
-                  Available credits
+                      Available credits
                     </p>
 
                     <p className="mt-1 font-serif text-3xl font-semibold">
@@ -634,9 +740,7 @@ export default async function PublicProfilePage({
                               ) : (
                                 <div className="flex h-full w-full items-center justify-center rounded-full bg-[#173d32] font-serif text-sm font-semibold text-[#e4c36a]">
                                   {badge.name
-                                    .charAt(
-                                      0,
-                                    )
+                                    .charAt(0)
                                     .toUpperCase()}
                                 </div>
                               )}

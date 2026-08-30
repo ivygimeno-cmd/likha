@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 
 export default async function OrdersPage({
@@ -14,19 +15,15 @@ export default async function OrdersPage({
   const activeFilter = params.filter ?? "all";
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const currentUser = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+if (!currentUser) {
+  redirect("/login");
+}
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+const { user, profile } = currentUser;
+
+
   const { data: orderRows, error: ordersError } = await supabase
     .from("orders")
     .select(

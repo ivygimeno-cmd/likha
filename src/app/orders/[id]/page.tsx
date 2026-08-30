@@ -74,50 +74,55 @@ const request = requestData as OrderProject | null;
   const revieweeId = isBuyer ? order.seller_id : order.buyer_id;
 const revieweeLabel = isBuyer ? "seller" : "buyer";
 
-const { data: deliveryDetails } = await supabase
-  .from("order_delivery_details")
-  .select(`
-    id,
-    recipient_name,
-    contact_number,
-    address_line,
-    barangay,
-    city,
-    province,
-    postal_code,
-    delivery_notes,
-    courier,
-    tracking_number,
-    shipped_at,
-    delivered_at
-  `)
-  .eq("order_id", order.id)
-  .maybeSingle();
+const [
+  { data: deliveryDetails },
+  { data: existingReview },
+  { data: existingRefund },
+  { data: orderPayment },
+] = await Promise.all([
+  supabase
+    .from("order_delivery_details")
+    .select(`
+      id,
+      recipient_name,
+      contact_number,
+      address_line,
+      barangay,
+      city,
+      province,
+      postal_code,
+      delivery_notes,
+      courier,
+      tracking_number,
+      shipped_at,
+      delivered_at
+    `)
+    .eq("order_id", order.id)
+    .maybeSingle(),
 
-const { data: existingReview } = await supabase
-  .from("reviews")
-  .select("rating, comment")
-  .eq("order_id", order.id)
-  .eq("reviewer_id", user.id)
-  .maybeSingle();
+  supabase
+    .from("reviews")
+    .select("rating, comment")
+    .eq("order_id", order.id)
+    .eq("reviewer_id", user.id)
+    .maybeSingle(),
 
-  const { data: existingRefund } = await supabase
-  .from("refund_requests")
- .select(
-  "id, status, reason, details, amount, seller_response, admin_response, created_at",
-)
-  .eq("order_id", order.id)
-  .in("status", [
-    "requested",
-    "under_review",
-    "approved",
-  ])
-  .maybeSingle();
+  supabase
+    .from("refund_requests")
+    .select(
+      "id, status, reason, details, amount, seller_response, admin_response, created_at",
+    )
+    .eq("order_id", order.id)
+    .in("status", [
+      "requested",
+      "under_review",
+      "approved",
+    ])
+    .maybeSingle(),
 
-  const { data: orderPayment } = await supabase
-  .from("order_payments")
-  .select(
-    `
+  supabase
+    .from("order_payments")
+    .select(`
       id,
       status,
       amount,
@@ -125,10 +130,10 @@ const { data: existingReview } = await supabase
       payout_eligible_at,
       payout_released_at,
       refunded_at
-    `,
-  )
-  .eq("order_id", order.id)
-  .maybeSingle();
+    `)
+    .eq("order_id", order.id)
+    .maybeSingle(),
+]);
 
 const paymentStatus =
   orderPayment?.status ?? "unpaid";

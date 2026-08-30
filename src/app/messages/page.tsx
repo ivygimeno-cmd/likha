@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import RealtimeMessageThread from "./realtime-message-thread";
 import MessageComposer from "./message-composer";
 import AdminVipSupport from "@/app/components/admin-vip-support";
@@ -37,24 +38,30 @@ export default async function MessagesPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+ const currentUser = await getCurrentUser();
 
-  const { data: adminCheck } =
-  await supabase.rpc("is_likha_admin");
+if (!currentUser) {
+  redirect("/login");
+}
 
-  const isAdmin = adminCheck === true;
+const { user, isAdmin } = currentUser;
 
-  if (!user) {
-    redirect("/login");
-  }
-  const {
-  data: moderationStatusData,
-  error: moderationStatusError,
-} = await supabase
-  .rpc("get_my_chat_moderation_status")
-  .maybeSingle();
+const [
+  { data: moderationStatusData, error: moderationStatusError },
+  { data: activeWarningData, error: activeWarningError },
+  { data: conversationData },
+] = await Promise.all([
+  supabase
+    .rpc("get_my_chat_moderation_status")
+    .maybeSingle(),
+
+  supabase
+    .rpc("get_my_active_moderation_warning")
+    .maybeSingle(),
+
+  supabase.rpc("get_message_conversations"),
+]);
+
 
 if (moderationStatusError) {
   throw new Error(
@@ -71,12 +78,7 @@ const moderationStatus = moderationStatusData as {
   chat_lock_reason: string | null;
 } | null;
 
-const {
-  data: activeWarningData,
-  error: activeWarningError,
-} = await supabase
-  .rpc("get_my_active_moderation_warning")
-  .maybeSingle();
+
 
 if (activeWarningError) {
   throw new Error(
@@ -217,9 +219,7 @@ if (
   );
 }
 
-  const { data: conversationData } = await supabase.rpc(
-    "get_message_conversations",
-  );
+  
 
   const conversations =
     (conversationData ?? []) as Conversation[];

@@ -15,6 +15,7 @@ type PortfolioProject = {
 type CreatorProfile = {
   id: string;
   display_name: string | null;
+  full_name: string | null;
   role: string | null;
 };
 
@@ -51,22 +52,25 @@ export default async function FeaturedProjectPage({
     notFound();
   }
 
-  const { data: featured } = await supabase
-    .from("featured_projects")
-    .select("project_id, is_active")
-    .eq("project_id", project.id)
-    .eq("is_active", true)
-    .maybeSingle();
+ const [{ data: featured }, { data: creator }] =
+  await Promise.all([
+    supabase
+      .from("featured_projects")
+      .select("project_id, is_active")
+      .eq("project_id", project.id)
+      .eq("is_active", true)
+      .maybeSingle(),
 
-  if (!featured) {
-    notFound();
-  }
+    supabase
+      .from("profiles")
+      .select("id, display_name, full_name, role")
+      .eq("id", project.owner_id)
+      .maybeSingle(),
+  ]);
 
-  const { data: creator } = await supabase
-    .from("profiles")
-    .select("id, display_name, role")
-    .eq("id", project.owner_id)
-    .maybeSingle();
+if (!featured) {
+  notFound();
+}
 
   const imageUrl = project.image_path
     ? supabase.storage
@@ -76,7 +80,9 @@ export default async function FeaturedProjectPage({
     : null;
 
   const creatorName =
-    creator?.display_name ?? "LIKHA Creator";
+  creator?.display_name ||
+  creator?.full_name ||
+  "LIKHA Creator";
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
@@ -107,7 +113,7 @@ export default async function FeaturedProjectPage({
           href="/marketplace"
           className="inline-flex items-center gap-2 text-sm font-semibold text-[#b76449] transition hover:text-[#173d32]"
         >
-          ← Bumalik sa Marketplace
+           Bumalik sa Marketplace
         </Link>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
@@ -128,9 +134,7 @@ export default async function FeaturedProjectPage({
           </div>
 
           <div className="lg:sticky lg:top-28">
-            <span className="inline-flex rounded-full bg-[#173d32] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#f3dfad]">
-              Featured creation
-            </span>
+       
 
             <h1 className="mt-5 font-serif text-4xl leading-tight font-semibold sm:text-5xl">
               {project.title}
