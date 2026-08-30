@@ -527,9 +527,10 @@ export default async function MarketplacePage({
             <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {dynamicFeaturedProjects.map(
                 (project) => (
-                  <article
+                  <Link
                     key={project.id}
-                    className="group"
+                    href={`/marketplace/projects/${project.id}`}
+                    className="group block"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#e9e1d2]">
                       {project.imageUrl ? (
@@ -573,10 +574,10 @@ export default async function MarketplacePage({
                       )}
 
                       <p className="mt-4 text-sm font-semibold text-[#173d32]/55">
-                        Featured portfolio project
+                        Tingnan ang project →
                       </p>
                     </div>
-                  </article>
+                  </Link>
                 ),
               )}
             </div>
