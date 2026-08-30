@@ -52,31 +52,41 @@ export default async function DashboardPage() {
   const isSeller = role === "seller";
 
   const [
-  { data: ratingData },
-  { data: creditBalanceData },
-] = await Promise.all([
-  supabase
-    .rpc("get_profile_rating", {
-      p_profile_id: user.id,
-    })
-    .maybeSingle(),
+    { data: publicProfileData },
+    { data: ratingData },
+    { data: creditBalanceData },
+  ] = await Promise.all([
+    supabase
+      .rpc("get_public_profile", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
 
-  supabase
-    .rpc("get_my_likha_credit_balance")
-    .maybeSingle(),
-]);
+    supabase
+      .rpc("get_profile_rating", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
 
+    supabase
+      .rpc("get_my_likha_credit_balance")
+      .maybeSingle(),
+  ]);
 
+  const publicProfile = publicProfileData as {
+    display_name: string;
+  } | null;
 
-const rating = ratingData as {
-  average_rating: number | string;
-  total_reviews: number;
-} | null;
+  const rating = ratingData as {
+    average_rating: number | string;
+    total_reviews: number;
+  } | null;
 
- const dashboardDisplayName =
-  profile?.full_name ??
-  profile?.business_name ??
-  "LIKHA user";
+  const dashboardDisplayName =
+    publicProfile?.display_name ??
+    profile?.full_name ??
+    profile?.business_name ??
+    "LIKHA user";
 
   const averageRating = Number(
     rating?.average_rating ?? 0,
