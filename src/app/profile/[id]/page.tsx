@@ -455,18 +455,21 @@ export default async function PublicProfilePage({
                       </span>
                     )}
 
-                    {isVip && (
-                      <span
-                        title="VIP member — priority service and dedicated LIKHA support."
-                        className="inline-flex items-center gap-1.5 rounded-full border border-[#b38a3e]/40 bg-[#d9c6a5]/45 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#7a5a22]"
-                      >
-                        <span aria-hidden="true">
-                          ◆
-                        </span>
-                        VIP
-                      </span>
-                    )}
+            {isVip && (
+  <span
+    title="VIP member — priority service and dedicated LIKHA support."
+    className="inline-flex items-center gap-2 rounded-full border border-[#b38a3e]/60 bg-[#173d32] px-3.5 py-2 text-xs font-semibold tracking-[0.08em] text-[#f3dfad] shadow-[0_2px_8px_rgba(23,61,50,0.12)]"
+  >
+    <span
+      aria-hidden="true"
+      className="flex h-5 w-5 items-center justify-center rounded-full border border-[#e4c36a]/70 bg-[#0f2f27] text-[15px] leading-none text-[#e4c36a]"
+    >
+      ♝
+    </span>
 
+    <span>VIP</span>
+  </span>
+)}
                     {hasAdminBadge && (
                       <span
                         title="Official LIKHA administrator."
