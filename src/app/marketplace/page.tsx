@@ -5,7 +5,7 @@ import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 type FeaturedProject = {
   id: number;
   title: string;
-  description: string;
+  description: string | null;
   image_path: string | null;
   owner_id: string;
   created_at: string;
@@ -13,8 +13,8 @@ type FeaturedProject = {
 
 type ProfileInfo = {
   id: string;
-  display_name: string;
-  role: string;
+  display_name: string | null;
+  role: string | null;
 };
 
 const categories = [
@@ -111,7 +111,7 @@ export default async function MarketplacePage({
         .from("profiles")
         .select("role")
         .eq("id", user.id)
-        .single()
+        .maybeSingle()
     : { data: null };
 
   const isSeller =
@@ -140,10 +140,7 @@ export default async function MarketplacePage({
     supabase
       .from("featured_projects")
       .select("project_id")
-      .eq("is_active", true)
-      .order("created_at", {
-        ascending: false,
-      }),
+      .eq("is_active", true),
   ]);
 
   if (openRequestsError) {
@@ -209,7 +206,9 @@ export default async function MarketplacePage({
       error: profileError,
     } = await supabase
       .from("profiles")
-      .select("id, display_name, role")
+      .select(
+        "id, display_name, role",
+      )
       .in("id", ownerIds);
 
     if (profileError) {
@@ -230,7 +229,7 @@ export default async function MarketplacePage({
     ]),
   );
 
-  const dynamicFeaturedProducts =
+  const dynamicFeaturedProjects =
     featuredProjects.map((project) => {
       const owner = profileMap.get(
         project.owner_id,
@@ -245,16 +244,14 @@ export default async function MarketplacePage({
         : null;
 
       return {
-        id: `featured-${project.id}`,
+        id: project.id,
         name: project.title,
         description:
           project.description,
         seller:
           owner?.display_name ??
           "LIKHA Creator",
-        category: "Featured",
         imageUrl,
-        isRealProject: true,
       };
     });
 
@@ -267,23 +264,8 @@ export default async function MarketplacePage({
             selectedCategory,
         );
 
-  const filteredFeaturedProducts =
-    dynamicFeaturedProducts.filter(
-      (product) => {
-        if (
-          selectedCategory ===
-          "Lahat"
-        ) {
-          return true;
-        }
-
-        return true;
-      },
-    );
-
   const hasFeaturedProjects =
-    filteredFeaturedProducts.length >
-    0;
+    dynamicFeaturedProjects.length > 0;
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
@@ -379,8 +361,7 @@ export default async function MarketplacePage({
                 <Link
                   key={category}
                   href={
-                    category ===
-                    "Lahat"
+                    category === "Lahat"
                       ? "/marketplace"
                       : `/marketplace?category=${encodeURIComponent(
                           category,
@@ -421,18 +402,16 @@ export default async function MarketplacePage({
               </div>
 
               <p className="text-sm font-semibold text-[#173d32]/55">
-                {openRequests?.length ??
-                  0}{" "}
-                {(openRequests?.length ??
-                  0) === 1
+                {openRequests?.length ?? 0}{" "}
+                {(openRequests?.length ?? 0) ===
+                1
                   ? "request"
                   : "requests"}
               </p>
             </div>
 
             {!openRequests ||
-            openRequests.length ===
-              0 ? (
+            openRequests.length === 0 ? (
               <div className="mt-8 rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-12 text-center">
                 <p className="font-serif text-2xl font-semibold">
                   Wala pang open buyer
@@ -530,7 +509,7 @@ export default async function MarketplacePage({
               <span className="font-normal text-[#173d32]/50">
                 (
                 {hasFeaturedProjects
-                  ? filteredFeaturedProducts.length
+                  ? dynamicFeaturedProjects.length
                   : fallbackFilteredProducts.length}
                 )
               </span>
@@ -546,7 +525,7 @@ export default async function MarketplacePage({
 
           {hasFeaturedProjects ? (
             <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredFeaturedProducts.map(
+              {dynamicFeaturedProjects.map(
                 (project) => (
                   <article
                     key={project.id}
