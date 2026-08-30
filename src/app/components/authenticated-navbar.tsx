@@ -445,7 +445,7 @@ const { data: notificationsData } =
                   href={`/profile/${user.id}`}
                   className="rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-[#173d32]/5"
                 >
-                  View Profile
+             Tingnan ang profile
                 </Link>
 
                 <Link

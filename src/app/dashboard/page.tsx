@@ -248,7 +248,7 @@ export default async function DashboardPage() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <div className="min-w-56 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
-                Available Credits
+              Available credits
               </p>
 
               <p className="mt-1 font-serif text-3xl font-semibold">
@@ -277,7 +277,7 @@ export default async function DashboardPage() {
  className="rounded-md border border-[#173d32]/20 bg-[#fbf8f1] px-7 py-4 text-center font-semibold text-[#173d32] transition hover:border-[#173d32]/40 hover:bg-white"
  
  >
-      Open Admin Panel
+   Admin Panel
     </Link>
   )}
 
@@ -285,7 +285,7 @@ export default async function DashboardPage() {
     href={`/profile/${user.id}`}
 className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
  >
-    View Profile
+  Tingnan ang profile
   </Link>
 
   <Link
@@ -293,8 +293,8 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
     className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
   >
     {isSeller
-      ? "Maghanap ng Proyekto"
-      : "Mag-post ng Request"}
+      ? "Maghanap ng project"
+      : "Mag-post ng request"}
   </Link>
 </div>
 
@@ -303,7 +303,7 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
         <div className="grid grid-cols-3 divide-x divide-[#173d32]/20">
           <div className="px-6 py-7">
             <p className="text-sm text-[#173d32]/55">
-              {isSeller ? "Available projects" : "Active orders"}
+              {isSeller ? "Available na projects" : "Active orders"}
             </p>
 
             <p className="mt-6 font-serif text-4xl font-semibold">
@@ -314,8 +314,8 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
           <div className="px-6 py-7">
             <p className="text-sm text-[#173d32]/55">
               {isSeller
-                ? "Submitted proposals"
-                : "Received proposals"}
+                ? "Mga sinend mong offer"
+                : "Mga natangap mong proposal"}
             </p>
 
             <p className="mt-6 font-serif text-4xl font-semibold">
@@ -325,7 +325,7 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
 
           <div className="px-6 py-7">
             <p className="text-sm text-[#173d32]/55">
-              Completed orders
+             Mga nakumpletong orders
             </p>
 
             <p className="mt-6 font-serif text-4xl font-semibold">
@@ -362,8 +362,8 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
 
               <p className="mt-3 text-[#173d32]/60">
                 {isSeller
-                  ? "Bumalik ulit kapag may bagong buyer request."
-                  : "I-post ang iyong unang idea para makatanggap ng seller proposals."}
+                  ? "Balikan ulit kapag may bagong request."
+                  : "Mag-post ng request para makatanggap ng offers mula sa creators."}
               </p>
 
               <Link

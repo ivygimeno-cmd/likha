@@ -341,7 +341,7 @@ const profile =
                             }
                             className="mt-1 inline-block text-xs font-semibold text-[#173d32] underline underline-offset-2 hover:text-[#b76449]"
                           >
-                            View Profile
+                          Tingnan ang profile
                           </Link>
 
                           <p className="mt-1 text-[10px] text-[#b76449]">
@@ -440,7 +440,7 @@ const profile =
                           href={`/profile/${selected.user_id}`}
                           className="text-sm font-semibold text-[#b76449] hover:underline"
                         >
-                          View Profile
+                       Tingnan ang profile
                         </Link>
                       ) : null;
                     })()}

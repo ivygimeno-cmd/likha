@@ -46,14 +46,19 @@ const termsSections: TermsSection[] = [
   {
     title: "5. Communication and Off-Platform Transactions",
     paragraphs: [
-      "All project-related communication and transactions must remain inside LIKHA when the buyer and seller were introduced through LIKHA.",
-      "Users may not share or request phone numbers, email addresses, social-media accounts, external messaging details, direct payment instructions, or other methods intended to move a LIKHA transaction outside the platform.",
-      "LIKHA may automatically block prohibited content and may record security events for fraud prevention, moderation, and enforcement.",
+      "When a buyer and seller are introduced through LIKHA, project-related communication and transactions should remain inside LIKHA.",
+      "Users must not share or request phone numbers, email addresses, social-media accounts, external messaging details, direct payment instructions, or other contact or payment information for the purpose of moving a LIKHA transaction outside the platform.",
+      "Users must not direct another user to Facebook, Messenger, WhatsApp, Telegram, Viber, Instagram, Discord, or similar platforms to continue a LIKHA transaction outside the platform.",
+      "Users must not arrange direct GCash, Maya, bank, cryptocurrency, or other payment arrangements outside the approved LIKHA checkout when the transaction originated through LIKHA.",
+      "If a buyer or seller chooses to continue a transaction outside LIKHA, that transaction is no longer covered by LIKHA's marketplace protections, transaction records, dispute process, refund controls, or other platform safeguards.",
+      "Users who knowingly move a transaction outside LIKHA do so at their own risk. LIKHA cannot guarantee assistance, recovery of funds, or resolution of losses arising from an off-platform transaction.",
+      "LIKHA may automatically block prohibited contact or payment information and may record security events for fraud prevention, moderation, and enforcement.",
     ],
     bullets: [
+      "No sharing or requesting contact details for the purpose of moving a LIKHA transaction outside the platform.",
       "No direct GCash, Maya, bank, cryptocurrency, or other payment arrangement outside the approved LIKHA checkout.",
       "No attempt to bypass LIKHA checkout, Credits rules, safety controls, dispute procedures, or transaction records.",
-      "No directing another user to Facebook, Messenger, WhatsApp, Telegram, Viber, Instagram, Discord, or similar platforms.",
+      "No directing another user to Facebook, Messenger, WhatsApp, Telegram, Viber, Instagram, Discord, or similar platforms to continue a LIKHA transaction outside the platform.",
     ],
   },
   {

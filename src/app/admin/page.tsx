@@ -1066,7 +1066,7 @@ data-search-text={`${account.account_name} ${account.email ?? ""} ${account.cont
                     href={`/profile/${account.user_id}`}
                     className="w-fit text-sm font-semibold text-[#b76449]"
                   >
-                    View Profile 
+                   Tingnan ang profile
                   </Link>
 
                   <Link

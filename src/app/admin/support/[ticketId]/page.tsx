@@ -211,7 +211,7 @@ async function respondToTicket(formData: FormData) {
               href={`/profile/${ticket.user_id}`}
               className="mt-4 inline-block text-sm font-semibold text-[#b76449]"
             >
-              View Profile 
+           Tingnan ang profile
             </Link>
           </div>
 

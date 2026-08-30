@@ -699,7 +699,7 @@ if (error) {
           ) : isOwner ? (
             <div className="border border-[#173d32]/20 bg-[#fbf8f1] p-7">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#b76449]">
-                Received proposals
+                Mga natanggap na proposal
               </p>
 
               <h2 className="mt-3 font-serif text-3xl font-semibold">

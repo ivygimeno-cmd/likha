@@ -583,7 +583,7 @@ export default async function PublicProfilePage({
                 <div className="mt-6 ml-6 flex flex-wrap items-center gap-4">
                   <div className="min-w-36 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-5 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
-                      Available Credits
+                  Available credits
                     </p>
 
                     <p className="mt-1 font-serif text-3xl font-semibold">

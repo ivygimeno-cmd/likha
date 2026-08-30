@@ -827,7 +827,7 @@ async function acknowledgeWarning(formData: FormData) {
                     href={`/profile/${selectedConversation.other_user_id}`}
                     className="shrink-0 text-sm font-semibold text-[#b76449] hover:text-[#9f503c]"
                   >
-                    View Profile 
+               Tingnan ang profile
                   </Link>
                 </div>
        

@@ -318,10 +318,7 @@ export default async function MarketplacePage({
               </h1>
 
               <p className="mt-5 max-w-2xl text-lg leading-8 text-[#173d32]/70">
-                Maghanap ng Filipino creators
-                para sa custom apparel,
-                personalized gifts, souvenirs
-                at branded business materials.
+                Maghanap ng creator para sa ipapagawa mo.
               </p>
             </div>
 
@@ -388,7 +385,7 @@ export default async function MarketplacePage({
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-                  Open Buyer Requests
+                  Mga bagong request
                 </p>
 
                 <h2 className="mt-2 font-serif text-4xl font-semibold">
@@ -396,8 +393,8 @@ export default async function MarketplacePage({
                 </h2>
 
                 <p className="mt-3 text-[#173d32]/60">
-                  Tingnan ang mga open requests
-                  at mag-submit ng proposal.
+                 May naghahanap ng creator.
+                 Tingnan ang requests at mag-send ng offer.
                 </p>
               </div>
 
@@ -414,13 +411,12 @@ export default async function MarketplacePage({
             openRequests.length === 0 ? (
               <div className="mt-8 rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-12 text-center">
                 <p className="font-serif text-2xl font-semibold">
-                  Wala pang open buyer
-                  requests.
+                 Wala pang bagong
+                 requests.
                 </p>
 
                 <p className="mt-2 text-sm text-[#173d32]/55">
-                  Bumalik ulit kapag may bagong
-                  project na available.
+                 Balikan ulit kapag may bagong request.
                 </p>
               </div>
             ) : (
@@ -574,7 +570,7 @@ export default async function MarketplacePage({
                       )}
 
                       <p className="mt-4 text-sm font-semibold text-[#173d32]/55">
-                        Tingnan ang project →
+                        Tingnan ang project
                       </p>
                     </div>
                   </Link>
