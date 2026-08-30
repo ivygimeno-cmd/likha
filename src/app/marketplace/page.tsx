@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 
 type FeaturedProject = {
@@ -100,22 +101,13 @@ export default async function MarketplacePage({
       ? requestedCategory
       : "Lahat";
 
-  const supabase = await createClient();
+ const supabase = await createClient();
+const currentUser = await getCurrentUser();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+const user = currentUser?.user ?? null;
+const profile = currentUser?.profile ?? null;
 
-  const { data: profile } = user
-    ? await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .maybeSingle()
-    : { data: null };
-
-  const isSeller =
-    profile?.role === "seller";
+const isSeller = profile?.role === "seller";
 
   const [
     { data: openRequests, error: openRequestsError },
@@ -180,7 +172,7 @@ export default async function MarketplacePage({
 
     if (projectError) {
       console.error(
-        "Featured portfolio projects error:",
+        "Featured project error:",
         projectError.message,
       );
     } else {
