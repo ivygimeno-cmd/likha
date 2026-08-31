@@ -23,7 +23,7 @@ const creditBundles = [
     credits: 50,
     price: 99,
     description:
-      "Para sa sellers na gustong sumubok ng ilang bagong projects.",
+      "Para sa creators na gustong sumubok ng ilang bagong projects.",
   },
   {
     code: "creator",
@@ -40,7 +40,7 @@ const creditBundles = [
     credits: 300,
     price: 449,
     description:
-      "Para sa studios at sellers na regular na nagpapadala ng proposals.",
+      "Para sa studios at creators na regular na nagpapadala ng proposals.",
   },
 ];
 
@@ -264,7 +264,7 @@ const { user } = currentUser;
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#173d32]/60">
-              Gagamit ang seller ng credits kapag nagpapadala
+              Gagamit ang creator ng credits kapag nagpapadala
               ng proposal sa buyer request.
             </p>
           </div>

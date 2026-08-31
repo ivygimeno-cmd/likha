@@ -13,7 +13,7 @@ const privacySections: PrivacySection[] = [
   {
     title: "1. Who We Are",
     paragraphs: [
-      "LIKHA is an online buyer–seller marketplace operated by Gimeno Design Solutions. For purposes of Philippine data-protection law, Gimeno Design Solutions is responsible for determining how and why personal data is processed through LIKHA.",
+      "LIKHA is an online buyer–creator marketplace operated by Gimeno Design Solutions. For purposes of Philippine data-protection law, Gimeno Design Solutions is responsible for determining how and why personal data is processed through LIKHA.",
     ],
   },
   {
@@ -23,7 +23,7 @@ const privacySections: PrivacySection[] = [
     ],
     bullets: [
       "Account information such as full name, email address, account role, and authentication records.",
-      "Profile information such as business name, profile photo, buyer or seller workspace information, ratings, and reviews.",
+      "Profile information such as business name, profile photo, buyer or creator workspace information, ratings, and reviews.",
       "Marketplace information including project requests, proposals, accepted orders, submitted work, order status, and transaction records.",
       "Communications sent through the LIKHA inbox.",
       "Security information such as login records, device information, browser information, IP address, suspicious activity, and blocked-message events.",
@@ -34,15 +34,15 @@ const privacySections: PrivacySection[] = [
   {
     title: "3. Public and Private Information",
     paragraphs: [
-      "Certain information is intentionally displayed publicly to help buyers and sellers evaluate each other. This may include your display name, business name, profile photo, workspace role, identity-verification badge, ratings, review count, and written reviews.",
-      "Order messages are limited to the relevant buyer and seller, except when access is reasonably necessary for authorized support, fraud prevention, dispute resolution, security investigation, or legal compliance.",
+      "Certain information is intentionally displayed publicly to help buyers and creators evaluate each other. This may include your display name, business name, profile photo, workspace role, identity-verification badge, ratings, review count, and written reviews.",
+      "Order messages are limited to the relevant buyer and creator, except when access is reasonably necessary for authorized support, fraud prevention, dispute resolution, security investigation, or legal compliance.",
       "Government IDs, selfies, biometric information, email addresses, payment credentials, and private security records are not displayed on public profiles.",
     ],
   },
   {
     title: "4. Identity Verification",
     paragraphs: [
-      "LIKHA may offer or require identity verification before a user can receive seller payouts, pay for certain orders, perform high-risk activities, or receive an Identity Verified badge.",
+      "LIKHA may offer or require identity verification before a user can receive creator payouts, pay for certain orders, perform high-risk activities, or receive an Identity Verified badge.",
       "The verification process may involve a government-issued ID, selfie, liveness check, face match, device signals, and duplicate-account detection.",
       "Identity verification may be processed by an approved third-party verification provider, such as Didit. The provider processes verification information on behalf of LIKHA according to its own security, privacy, and retention controls.",
       "LIKHA intends to retain only the minimum verification record needed, such as verification status, provider reference, verification level, and verification date. Raw ID and selfie files will not be placed in a public profile or public storage bucket.",
@@ -63,12 +63,12 @@ const privacySections: PrivacySection[] = [
     ],
     bullets: [
       "Create, authenticate, maintain, and secure user accounts.",
-      "Operate buyer and seller workspaces.",
+      "Operate buyer and creator workspaces.",
       "Publish requests, submit proposals, create orders, and manage order completion.",
-      "Provide internal buyer–seller messaging.",
+      "Provide internal buyer–creator messaging.",
       "Verify identity and prevent duplicate or fraudulent accounts.",
-      "Process payments, seller payouts, refunds, fees, and financial reconciliation when payment functionality is activated.",
-      "Calculate the applicable 5% LIKHA seller service fee.",
+      "Process payments, creator payouts, refunds, fees, and financial reconciliation when payment functionality is activated.",
+      "Calculate the applicable 5% LIKHA creator service fee.",
       "Detect prohibited contact information, off-platform transactions, abuse, fraud, and security threats.",
       "Provide customer support and resolve disputes.",
       "Comply with applicable laws, lawful requests, and regulatory obligations.",

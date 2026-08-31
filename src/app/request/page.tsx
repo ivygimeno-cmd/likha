@@ -120,7 +120,7 @@ if (deliveryError) {
 
           <p className="mx-auto mt-5 max-w-lg leading-7 text-[#173d32]/70">
             Kapag live na ang marketplace, makatatanggap dito ang buyer ng
-            proposals at quotations mula sa qualified local sellers.
+            proposals at quotations mula sa qualified local creators.
           </p>
 
           <div className="mt-9 flex flex-col justify-center gap-4 sm:flex-row">
@@ -180,7 +180,7 @@ if (deliveryError) {
           <div className="mt-10 space-y-6">
             {[
               "Libre ang pag-post ng request",
-              "Ikaw ang pipili ng seller",
+              "Ikaw ang pipili ng creator",
               "Makukumpara mo ang presyo at timeline",
             ].map((benefit) => (
               <div key={benefit} className="flex items-center gap-4">
@@ -345,9 +345,9 @@ if (deliveryError) {
     </h2>
 
     <p className="mt-2 text-sm leading-6 text-[#173d32]/65">
-      Ang city/province lang ang makikita ng sellers habang open pa ang
+      Ang city/province lang ang makikita ng creators habang open pa ang
       request. Ang buong pangalan, contact number, at address ay magiging
-      visible lamang sa seller na tatanggapin mo.
+      visible lamang sa creator na tatanggapin mo.
     </p>
   </div>
 
@@ -514,7 +514,7 @@ if (deliveryError) {
     />
 
     <p className="mt-2 text-xs leading-5 text-[#173d32]/55">
-      Ito lang ang location na makikita ng sellers bago ka pumili ng proposal.
+      Ito lang ang location na makikita ng creators bago ka pumili ng proposal.
     </p>
   </div>
 </div>
@@ -532,7 +532,7 @@ if (deliveryError) {
 
               <span className="text-sm leading-6 text-[#173d32]/70">
                 Kinukumpirma kong tama ang project details at maaari itong
-                makita ng verified Likha sellers.
+                makita ng verified Likha creators.
               </span>
             </label>
 

@@ -164,7 +164,7 @@ export default async function NewSupportTicketPage({
             <p className="text-sm leading-6 text-[#173d32]/60">
               Support tickets are for account review and
               platform-related concerns. They cannot be used to
-              contact buyers or sellers outside LIKHA.
+              contact buyers or creators outside LIKHA.
             </p>
           </div>
 

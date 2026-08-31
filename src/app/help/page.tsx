@@ -114,43 +114,43 @@ const orderFaqs = [
     question:
       "Paano ko malalaman ang status ng aking order?",
     answer:
-      "Pumunta sa Orders upang makita ang kasalukuyang status ng iyong order, kasama ang mga update mula sa seller o creator.",
+      "Pumunta sa Orders upang makita ang kasalukuyang status ng iyong order, kasama ang mga update mula sa creator o creator.",
   },
   {
     question:
-      "Hindi pa ina-accept ng seller ang order ko. Ano ang gagawin ko?",
+      "Hindi pa ina-accept ng creator ang order ko. Ano ang gagawin ko?",
     answer:
-      "Hintayin muna ang response ng seller. Kung matagal nang walang update, maaari kang mag-message sa seller o makipag-ugnayan sa LIKHA Support.",
+      "Hintayin muna ang response ng creator. Kung matagal nang walang update, maaari kang mag-message sa creator o makipag-ugnayan sa LIKHA Support.",
   },
   {
     question:
       "Pwede ko bang baguhin ang detalye ng order ko?",
     answer:
-      "Depende ito sa kasalukuyang status ng order. Kung hindi pa nagsisimula ang paggawa, kausapin agad ang seller sa Messages upang malaman kung maaari pang baguhin ang request.",
+      "Depende ito sa kasalukuyang status ng order. Kung hindi pa nagsisimula ang paggawa, kausapin agad ang creator sa Messages upang malaman kung maaari pang baguhin ang request.",
   },
   {
     question:
       "Pwede ko bang i-cancel ang aking order?",
     answer:
-      "Ang cancellation ay depende sa status ng order at kung nagsimula na ang seller sa paggawa. I-check ang order details at kausapin muna ang seller bago mag-request ng cancellation.",
+      "Ang cancellation ay depende sa status ng order at kung nagsimula na ang creator sa paggawa. I-check ang order details at kausapin muna ang creator bago mag-request ng cancellation.",
   },
   {
     question:
-      "Walang update ang seller sa order ko.",
+      "Walang update ang creator sa order ko.",
     answer:
-      "Magpadala muna ng message sa seller. Kung hindi pa rin sumagot o matagal nang walang progress, maaari kang mag-submit ng support request para ma-review ng LIKHA.",
+      "Magpadala muna ng message sa creator. Kung hindi pa rin sumagot o matagal nang walang progress, maaari kang mag-submit ng support request para ma-review ng LIKHA.",
   },
   {
     question:
       "Hindi tugma ang natanggap ko sa napag-usapan.",
     answer:
-      "I-save ang anumang larawan, messages, at order details na makakatulong bilang reference. Makipag-ugnayan muna sa seller at kung hindi ma-resolve, mag-report sa LIKHA Support.",
+      "I-save ang anumang larawan, messages, at order details na makakatulong bilang reference. Makipag-ugnayan muna sa creator at kung hindi ma-resolve, mag-report sa LIKHA Support.",
   },
   {
     question:
       "May problema sa delivery ng order ko.",
     answer:
-      "I-check muna ang delivery or tracking information kung available. Kung seller-arranged ang delivery, kausapin ang seller para sa update. Kung may dispute, maaaring i-escalate sa LIKHA Support.",
+      "I-check muna ang delivery or tracking information kung available. Kung creator-arranged ang delivery, kausapin ang creator para sa update. Kung may dispute, maaaring i-escalate sa LIKHA Support.",
   },
   {
     question:
@@ -171,7 +171,7 @@ const paymentFaqs = [
     question:
       "Anong payment methods ang puwedeng gamitin sa LIKHA?",
     answer:
-      "Makikita ang available payment methods bago i-confirm ang iyong order. Maaaring mag-iba ang options depende sa seller at sa kasalukuyang payment setup ng LIKHA.",
+      "Makikita ang available payment methods bago i-confirm ang iyong order. Maaaring mag-iba ang options depende sa creator at sa kasalukuyang payment setup ng LIKHA.",
   },
   {
     question:
@@ -217,7 +217,7 @@ const paymentFaqs = [
     question:
       "Safe ba ang payment information ko?",
     answer:
-      "Hindi dapat ibinibigay sa seller o sa ibang user ang iyong password, OTP, card PIN, o iba pang sensitibong payment credentials. Kung may humihingi nito, i-report agad sa LIKHA.",
+      "Hindi dapat ibinibigay sa creator o sa ibang user ang iyong password, OTP, card PIN, o iba pang sensitibong payment credentials. Kung may humihingi nito, i-report agad sa LIKHA.",
   },
 ];
 

@@ -166,7 +166,7 @@ export async function POST(request: Request) {
             id,
             order_id,
             buyer_id,
-            seller_id,
+            creator_id,
             amount,
             status
           `,
@@ -196,7 +196,7 @@ export async function POST(request: Request) {
               id,
               order_id,
               buyer_id,
-              seller_id,
+              creator_id,
               amount,
               status
             `,
@@ -314,7 +314,7 @@ export async function POST(request: Request) {
           },
           {
             user_id:
-              paymentRecord.seller_id,
+              paymentRecord.creator_id,
             type: "payment_received",
             title:
               "Order payment secured",

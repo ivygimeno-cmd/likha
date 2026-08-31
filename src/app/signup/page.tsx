@@ -130,7 +130,7 @@ export default function SignUpPage() {
 
     if (
       role !== "buyer" &&
-      role !== "seller"
+      role !== "creator"
     ) {
       setErrorMessage(
         "Pumili ng valid na workspace.",
@@ -333,8 +333,8 @@ export default function SignUpPage() {
                   Buyer — May ipapagawa ako
                 </option>
 
-                <option value="seller">
-                  Seller — Tatanggap ako ng
+                <option value="creator">
+                  creator — Tatanggap ako ng
                   projects
                 </option>
               </select>

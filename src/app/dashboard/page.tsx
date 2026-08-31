@@ -30,7 +30,7 @@ const { data: verificationData } = await supabase
     verification?.is_verified === true;
 
   const role = profile?.role ?? "buyer";
-  const isSeller = role === "seller";
+  const iscreator = role === "creator";
 
   const [
     { data: publicProfileData },
@@ -97,7 +97,7 @@ const { data: verificationData } = await supabase
     )
     .order("created_at", { ascending: false });
 
-  if (isSeller) {
+  if (iscreator) {
     requestQuery = requestQuery
       .eq("status", "open")
       .neq("buyer_id", user.id);
@@ -128,7 +128,7 @@ const { data: verificationData } = await supabase
     );
   }
 
-  const openRequestCount = isSeller
+  const openRequestCount = iscreator
     ? (requests?.length ?? 0)
     : (requests ?? []).filter(
         (request) => request.status === "open",
@@ -164,9 +164,9 @@ const { data: verificationData } = await supabase
     </h1>
 
     <p className="mt-4 text-[#173d32]/65">
-      {isSeller
+      {iscreator
         ? "Tingnan ang mga bagong request na maaari mong gawan ng proposal."
-        : "Pamahalaan ang iyong custom requests at seller proposals."}
+        : "Pamahalaan ang iyong custom requests at creator proposals."}
     </p>
   </div>
 
@@ -270,10 +270,10 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
   </Link>
 
   <Link
-    href={isSeller ? "/marketplace" : "/request"}
+    href={iscreator ? "/marketplace" : "/request"}
     className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
   >
-    {isSeller
+    {iscreator
       ? "Maghanap ng project"
       : "Mag-post ng request"}
   </Link>
@@ -284,17 +284,17 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
         <div className="grid grid-cols-3 divide-x divide-[#173d32]/20">
           <div className="px-6 py-7">
             <p className="text-sm text-[#173d32]/55">
-              {isSeller ? "Available na projects" : "Active orders"}
+              {iscreator ? "Available na projects" : "Active orders"}
             </p>
 
             <p className="mt-6 font-serif text-4xl font-semibold">
-              {isSeller ? openRequestCount : activeOrderCount}
+              {iscreator ? openRequestCount : activeOrderCount}
             </p>
           </div>
 
           <div className="px-6 py-7">
             <p className="text-sm text-[#173d32]/55">
-              {isSeller
+              {iscreator
                 ? "Mga sinend mong offer"
                 : "Mga natangap mong proposal"}
             </p>
@@ -326,7 +326,7 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
 
 
               <h2 className="mt-2 font-serif text-4xl font-semibold">
-                {isSeller
+                {iscreator
                   ? "Mga naghahanap ng creator"
                   : "Mga ipinapagawa mo"}
               </h2>
@@ -336,22 +336,22 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
           {!requests || requests.length === 0 ? (
             <div className="mt-8 border-y border-[#173d32]/15 py-16 text-center">
               <p className="font-serif text-3xl font-semibold">
-                {isSeller
+                {iscreator
                   ? "Wala pang available na request."
                   : "Wala ka pang ipinapagawa."}
               </p>
 
               <p className="mt-3 text-[#173d32]/60">
-                {isSeller
+                {iscreator
                   ? "Balikan ulit kapag may bagong request."
                   : "Mag-post ng request para makatanggap ng offers mula sa creators."}
               </p>
 
               <Link
-                href={isSeller ? "/marketplace" : "/request"}
+                href={iscreator ? "/marketplace" : "/request"}
                 className="mt-7 inline-block font-semibold text-[#b76449]"
               >
-                {isSeller ? "Pumunta sa Marketplace " : "Magpagawa ngayon "}
+                {iscreator ? "Pumunta sa Marketplace " : "Magpagawa ngayon "}
               </Link>
             </div>
           ) : (

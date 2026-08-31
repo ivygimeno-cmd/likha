@@ -79,7 +79,7 @@ export default async function VerificationPage() {
 
               <p className="mt-5 leading-8 text-white/70">
                 Ang verification badge ay tumutulong
-                sa buyers at sellers na magkaroon ng
+                sa buyers at creators na magkaroon ng
                 mas malinaw na trust signal bago
                 makipagtransaksyon.
               </p>
@@ -114,7 +114,7 @@ export default async function VerificationPage() {
 
                   <p className="mt-1 text-sm leading-6 text-white/60">
                     Hindi ipinapakita sa buyers o
-                    sellers ang ID at selfie.
+                    creators ang ID at selfie.
                   </p>
                 </div>
               </div>

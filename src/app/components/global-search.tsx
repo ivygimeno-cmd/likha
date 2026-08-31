@@ -207,8 +207,8 @@ export default function GlobalSearch() {
                           </p>
 
                           <p className="text-xs text-[#b76449]">
-                            {person.role === "seller"
-                              ? "Seller"
+                            {person.role === "creator"
+                              ? "creator"
                               : "Buyer"}
                           </p>
                         </div>

@@ -41,7 +41,7 @@ const { data: notificationsData } =
     (notification) => !notification.read_at,
   ).length;
 
-  const isSeller = profile?.role === "seller";
+  const iscreator = profile?.role === "creator";
 
   const displayName =
     profile?.full_name ??
@@ -69,9 +69,9 @@ const { data: notificationsData } =
       .single();
 
     const nextRole =
-      currentProfile?.role === "seller"
+      currentProfile?.role === "creator"
         ? "buyer"
-        : "seller";
+        : "creator";
 
     const { error } = await supabase
       .from("profiles")
@@ -399,7 +399,7 @@ const { data: notificationsData } =
                 </p>
 
                 <p className="text-[11px] font-semibold text-[#b76449]">
-                  {isSeller ? "Seller" : "Buyer"}
+                  {iscreator ? "creator" : "Buyer"}
                 </p>
               </div>
 
@@ -432,8 +432,8 @@ const { data: notificationsData } =
                 </p>
 
                 <p className="mt-1 text-xs font-semibold text-[#b76449]">
-                  {isSeller
-                    ? "Seller workspace"
+                  {iscreator
+                    ? "creator workspace"
                     : "Buyer workspace"}
                 </p>
               </div>
@@ -483,9 +483,9 @@ const { data: notificationsData } =
                     type="submit"
                     className="w-full rounded-xl px-4 py-3 text-left text-sm font-semibold text-[#b76449] transition hover:bg-[#b76449]/10"
                   >
-                    {isSeller
+                    {iscreator
                       ? "Switch to Buyer"
-                      : "Switch to Seller"}
+                      : "Switch to creator"}
                   </button>
                 </form>
 

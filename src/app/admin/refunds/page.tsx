@@ -6,7 +6,7 @@ type RefundRequest = {
   id: string;
   order_id: string;
   buyer_id: string;
-  seller_id: string;
+  creator_id: string;
   reason: string;
   details: string | null;
   amount: number | string | null;
@@ -17,7 +17,7 @@ type RefundRequest = {
     | "rejected"
     | "refunded"
     | "cancelled";
-  seller_response: string | null;
+  creator_response: string | null;
   admin_response: string | null;
   reviewed_at: string | null;
   created_at: string;
@@ -90,12 +90,12 @@ export default async function AdminRefundsPage({
         id,
         order_id,
         buyer_id,
-        seller_id,
+        creator_id,
         reason,
         details,
         amount,
         status,
-        seller_response,
+        creator_response,
         admin_response,
         reviewed_at,
         created_at
@@ -118,7 +118,7 @@ export default async function AdminRefundsPage({
     ...new Set(
       refunds.flatMap((refund) => [
         refund.buyer_id,
-        refund.seller_id,
+        refund.creator_id,
       ]),
     ),
   ];
@@ -213,7 +213,7 @@ export default async function AdminRefundsPage({
     } = await supabase
       .from("refund_requests")
       .select(
-        "id, order_id, buyer_id, seller_id, status",
+        "id, order_id, buyer_id, creator_id, status",
       )
       .eq("id", refundId)
       .single();
@@ -276,7 +276,7 @@ export default async function AdminRefundsPage({
           href: `/orders/${refund.order_id}`,
         },
         {
-          user_id: refund.seller_id,
+          user_id: refund.creator_id,
           type: "refund_update",
           title,
           message,
@@ -326,7 +326,7 @@ export default async function AdminRefundsPage({
 
         <p className="mt-4 max-w-2xl leading-7 text-[#173d32]/55">
           Review refund requests from buyers,
-          seller responses, and final refund
+          creator responses, and final refund
           decisions.
         </p>
 
@@ -457,12 +457,12 @@ export default async function AdminRefundsPage({
 
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/40">
-                      Seller Response
+                      creator Response
                     </p>
 
                     <p className="mt-2 text-sm leading-7">
-                      {selectedRefund.seller_response ||
-                        "Seller has not responded yet."}
+                      {selectedRefund.creator_response ||
+                        "creator has not responded yet."}
                     </p>
                   </div>
 
@@ -544,7 +544,7 @@ export default async function AdminRefundsPage({
                         selectedRefund.admin_response ??
                         ""
                       }
-                      placeholder="Add review notes or an explanation for the buyer and seller."
+                      placeholder="Add review notes or an explanation for the buyer and creator."
                       className="mt-2 w-full resize-y rounded-xl border border-[#173d32]/15 bg-white px-4 py-3 text-sm leading-6 outline-none focus:border-[#b76449]"
                     />
                   </div>

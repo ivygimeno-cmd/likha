@@ -68,7 +68,7 @@ const refundOrderIds = new Set(
     }),
   );
 
-  const isSeller = profile?.role === "seller";
+  const iscreator = profile?.role === "creator";
   const filteredOrders = orders.filter((order) => {
   if (activeFilter === "completed") {
     return order.status === "completed";
@@ -169,7 +169,7 @@ const refundOrderIds = new Set(
 
     <p className="mt-3 text-[#173d32]/60">
       {activeFilter === "all"
-        ? "Lalabas dito ang order kapag may tinanggap na seller proposal."
+        ? "Lalabas dito ang order kapag may tinanggap na creator proposal."
         : "Subukan ang ibang filter upang makita ang iba mong orders."}
     </p>
 
@@ -245,7 +245,7 @@ const refundOrderIds = new Set(
   </Link>
 
 
-  {!isSeller &&
+  {!iscreator &&
     ["in_progress", "submitted", "completed"].includes(
       order.status,
     ) && (

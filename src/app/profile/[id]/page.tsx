@@ -223,7 +223,7 @@ export default async function PublicProfilePage({
       .eq("follower_id", id),
 
     /*
-     * Completed seller projects
+     * Completed creator projects
      */
     supabase
       .from("orders")
@@ -231,7 +231,7 @@ export default async function PublicProfilePage({
         count: "exact",
         head: true,
       })
-      .eq("seller_id", id)
+      .eq("creator_id", id)
       .eq("status", "completed"),
 
     /*
@@ -547,8 +547,8 @@ export default async function PublicProfilePage({
 
                   <p className="mt-3 text-[#173d32]/60">
                     {profile.workspace_role ===
-                    "seller"
-                      ? "Seller workspace"
+                    "creator"
+                      ? "creator workspace"
                       : "Buyer workspace"}
                   </p>
 

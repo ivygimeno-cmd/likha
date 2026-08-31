@@ -337,7 +337,7 @@ const latestSupportRequests =
   id: string;
   order_id: string;
   buyer_id: string;
-  seller_id: string;
+  creator_id: string;
   reason: string;
   amount: number | string | null;
   status: string;
@@ -354,7 +354,7 @@ const {
       id,
       order_id,
       buyer_id,
-      seller_id,
+      creator_id,
       reason,
       amount,
       status,

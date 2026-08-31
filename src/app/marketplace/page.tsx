@@ -30,7 +30,7 @@ const categories = [
 const fallbackProducts = [
   {
     name: "Custom Event T-Shirts",
-    seller: "Habi Studio",
+    creator: "Habi Studio",
     location: "Quezon City",
     price: "Starts at ₱180",
     category: "Apparel",
@@ -39,7 +39,7 @@ const fallbackProducts = [
   },
   {
     name: "Personalized Ceramic Mugs",
-    seller: "Luwad & Co.",
+    creator: "Luwad & Co.",
     location: "Antipolo City",
     price: "Starts at ₱250",
     category: "Gifts",
@@ -48,7 +48,7 @@ const fallbackProducts = [
   },
   {
     name: "Branded Product Packaging",
-    seller: "Tatak Creative",
+    creator: "Tatak Creative",
     location: "Makati City",
     price: "Starts at ₱1,500",
     category: "Business",
@@ -57,7 +57,7 @@ const fallbackProducts = [
   },
   {
     name: "Wedding Souvenir Sets",
-    seller: "Gunita Handmade",
+    creator: "Gunita Handmade",
     location: "Cavite",
     price: "Starts at ₱95",
     category: "Souvenirs",
@@ -66,7 +66,7 @@ const fallbackProducts = [
   },
   {
     name: "Custom Tote Bags",
-    seller: "Sining Lokal",
+    creator: "Sining Lokal",
     location: "Pasig City",
     price: "Starts at ₱160",
     category: "Apparel",
@@ -75,7 +75,7 @@ const fallbackProducts = [
   },
   {
     name: "Logo Sticker Packages",
-    seller: "Guhit Prints",
+    creator: "Guhit Prints",
     location: "Manila",
     price: "Starts at ₱350",
     category: "Business",
@@ -107,13 +107,13 @@ const currentUser = await getCurrentUser();
 const user = currentUser?.user ?? null;
 const profile = currentUser?.profile ?? null;
 
-const isSeller = profile?.role === "seller";
+const iscreator = profile?.role === "creator";
 
   const [
     { data: openRequests, error: openRequestsError },
     { data: featuredRows, error: featuredError },
   ] = await Promise.all([
-    isSeller
+    iscreator
       ? supabase
           .from("project_requests")
           .select(
@@ -240,7 +240,7 @@ const isSeller = profile?.role === "seller";
         name: project.title,
         description:
           project.description,
-        seller:
+        creator:
           owner?.display_name ??
           "LIKHA Creator",
         imageUrl,
@@ -371,7 +371,7 @@ const isSeller = profile?.role === "seller";
         </div>
       </section>
 
-      {isSeller && (
+      {iscreator && (
         <section className="border-y border-[#173d32]/15 bg-[#f5f0e6] px-6 py-14 lg:px-10">
           <div className="mx-auto max-w-7xl">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -548,7 +548,7 @@ const isSeller = profile?.role === "seller";
 
                     <div className="pt-5">
                       <p className="text-sm text-[#b76449]">
-                        {project.seller}
+                        {project.creator}
                       </p>
 
                       <h2 className="mt-1 font-serif text-2xl font-semibold">
@@ -607,7 +607,7 @@ const isSeller = profile?.role === "seller";
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-sm text-[#b76449]">
-                            {product.seller} ·{" "}
+                            {product.creator} ·{" "}
                             {product.location}
                           </p>
 

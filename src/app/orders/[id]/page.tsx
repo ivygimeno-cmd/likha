@@ -51,7 +51,7 @@ export default async function OrderDetailsPage({
         status,
         created_at,
         buyer_id,
-        seller_id
+        creator_id
       `,
     )
     .eq("id", id)
@@ -70,9 +70,9 @@ const { data: requestData } = await supabase
 const request = requestData as OrderProject | null;
 
   const isBuyer = order.buyer_id === user.id;
-  const isSeller = order.seller_id === user.id;
-  const revieweeId = isBuyer ? order.seller_id : order.buyer_id;
-const revieweeLabel = isBuyer ? "seller" : "buyer";
+  const iscreator = order.creator_id === user.id;
+  const revieweeId = isBuyer ? order.creator_id : order.buyer_id;
+const revieweeLabel = isBuyer ? "creator" : "buyer";
 
 const [
   { data: deliveryDetails },
@@ -110,7 +110,7 @@ const [
   supabase
     .from("refund_requests")
     .select(
-      "id, status, reason, details, amount, seller_response, admin_response, created_at",
+      "id, status, reason, details, amount, creator_response, admin_response, created_at",
     )
     .eq("order_id", order.id)
     .in("status", [
@@ -149,12 +149,12 @@ const isPaymentSecured = [
     {
       key: "in_progress",
       title: "In progress",
-      description: "Sinimulan na ng seller ang paggawa.",
+      description: "Sinimulan na ng creator ang paggawa.",
     },
     {
       key: "submitted",
       title: "For buyer review",
-      description: "Isinumite na ng seller para sa buyer review.",
+      description: "Isinumite na ng creator para sa buyer review.",
     },
     {
       key: "completed",
@@ -185,17 +185,17 @@ async function submitOrder() {
 
   const { data: currentOrder } = await supabase
     .from("orders")
-    .select("id, seller_id")
+    .select("id, creator_id")
     .eq("id", id)
     .single();
 
   if (
     !currentOrder ||
-    currentOrder.seller_id !== user.id
+    currentOrder.creator_id !== user.id
   ) {
     redirect(
       `/orders/${id}?error=${encodeURIComponent(
-        "Only the seller can submit this order.",
+        "Only the creator can submit this order.",
       )}`,
     );
   }
@@ -253,7 +253,7 @@ async function submitOrder() {
 
   const { data: currentOrder } = await supabase
     .from("orders")
-    .select("id, buyer_id, seller_id")
+    .select("id, buyer_id, creator_id")
     .eq("id", id)
     .single();
 
@@ -324,7 +324,7 @@ if (payoutUpdateError) {
     .insert([
       {
         user_id:
-          currentOrder.seller_id,
+          currentOrder.creator_id,
         type: "payout_pending",
         title:
           "Order completed",
@@ -493,17 +493,17 @@ async function markOrderShipped(formData: FormData) {
 
   const { data: currentOrder } = await supabase
     .from("orders")
-    .select("seller_id")
+    .select("creator_id")
     .eq("id", id)
     .single();
 
   if (
     !currentOrder ||
-    currentOrder.seller_id !== user.id
+    currentOrder.creator_id !== user.id
   ) {
     redirect(
       `/orders/${id}?error=${encodeURIComponent(
-        "Only the seller can ship this order.",
+        "Only the creator can ship this order.",
       )}`,
     );
   }
@@ -529,7 +529,7 @@ async function markOrderShipped(formData: FormData) {
   }
 
   const { error } = await supabase.rpc(
-    "seller_mark_order_shipped",
+    "creator_mark_order_shipped",
     {
       p_order_id: id,
       p_courier: courier,
@@ -588,7 +588,7 @@ const evidenceFiles = formData
   const { data: currentOrder } = await supabase
     .from("orders")
     .select(
-      "id, buyer_id, seller_id, agreed_price, status",
+      "id, buyer_id, creator_id, agreed_price, status",
     )
     .eq("id", id)
     .single();
@@ -645,7 +645,7 @@ const {
   .insert({
     order_id: currentOrder.id,
     buyer_id: currentOrder.buyer_id,
-    seller_id: currentOrder.seller_id,
+    creator_id: currentOrder.creator_id,
     reason,
     details: details || null,
     amount: currentOrder.agreed_price,
@@ -737,7 +737,7 @@ const { error: notificationError } =
   await supabase
     .from("notifications")
     .insert({
-      user_id: currentOrder.seller_id,
+      user_id: currentOrder.creator_id,
       type: "refund_requested",
       title: "Refund request received",
       message:
@@ -773,11 +773,11 @@ async function respondToRefund(formData: FormData) {
     formData.get("refund_id") ?? "",
   ).trim();
 
-  const sellerResponse = String(
-    formData.get("seller_response") ?? "",
+  const creatorResponse = String(
+    formData.get("creator_response") ?? "",
   ).trim();
 
-  if (!refundId || sellerResponse.length < 3) {
+  if (!refundId || creatorResponse.length < 3) {
     redirect(
       `/orders/${id}?error=${encodeURIComponent(
         "Please enter a response.",
@@ -788,15 +788,15 @@ async function respondToRefund(formData: FormData) {
   const { data: refund } = await supabase
     .from("refund_requests")
     .select(
-      "id, buyer_id, seller_id, status",
+      "id, buyer_id, creator_id, status",
     )
     .eq("id", refundId)
     .single();
 
-  if (!refund || refund.seller_id !== user.id) {
+  if (!refund || refund.creator_id !== user.id) {
     redirect(
       `/orders/${id}?error=${encodeURIComponent(
-        "Only the seller can respond to this refund request.",
+        "Only the creator can respond to this refund request.",
       )}`,
     );
   }
@@ -804,7 +804,7 @@ async function respondToRefund(formData: FormData) {
   const { error } = await supabase
     .from("refund_requests")
     .update({
-      seller_response: sellerResponse,
+      creator_response: creatorResponse,
       status:
         refund.status === "requested"
           ? "under_review"
@@ -826,10 +826,10 @@ async function respondToRefund(formData: FormData) {
       .from("notifications")
       .insert({
         user_id: refund.buyer_id,
-        type: "refund_seller_response",
-        title: "Seller responded to your refund request",
+        type: "refund_creator_response",
+        title: "creator responded to your refund request",
         message:
-          "The seller added a response to your refund request.",
+          "The creator added a response to your refund request.",
         href: `/orders/${id}`,
       });
 
@@ -966,7 +966,7 @@ async function respondToRefund(formData: FormData) {
       </p>
 
       <p className="mt-1 text-xs leading-5 text-[#173d32]/50">
-        The seller should only begin production after LIKHA confirms
+        The creator should only begin production after LIKHA confirms
         the payment.
       </p>
 
@@ -999,7 +999,7 @@ async function respondToRefund(formData: FormData) {
       </p>
 
       <p className="mt-1 text-xs leading-5 text-[#173d32]/55">
-        The seller may now proceed with the order.
+        The creator may now proceed with the order.
       </p>
     </div>
   )}
@@ -1007,11 +1007,11 @@ async function respondToRefund(formData: FormData) {
   {paymentStatus === "payout_pending" && (
     <div className="mt-3 rounded-xl bg-[#dfe9df] p-4">
       <p className="font-semibold">
-        Seller payout pending
+        creator payout pending
       </p>
 
       <p className="mt-1 text-xs leading-5 text-[#173d32]/55">
-        The order is complete and the seller is eligible for payout.
+        The order is complete and the creator is eligible for payout.
       </p>
     </div>
   )}
@@ -1019,7 +1019,7 @@ async function respondToRefund(formData: FormData) {
   {paymentStatus === "payout_released" && (
     <div className="mt-3 rounded-xl bg-[#dfe9df] p-4">
       <p className="font-semibold">
-        ✓ Seller paid
+        ✓ creator paid
       </p>
     </div>
   )}
@@ -1056,7 +1056,7 @@ async function respondToRefund(formData: FormData) {
               </p>
 
               <h2 className="mt-2 font-serif text-3xl font-semibold">
-                Buyer & Seller conversation
+                Buyer & creator conversation
               </h2>
 
               <p className="mt-2 text-sm text-[#173d32]/60">
@@ -1084,7 +1084,7 @@ async function respondToRefund(formData: FormData) {
 
     <p className="mt-2 max-w-2xl text-sm leading-6 text-[#173d32]/60">
       Delivery information is kept inside LIKHA and is only
-      visible to the buyer and the seller assigned to this order.
+      visible to the buyer and the creator assigned to this order.
     </p>
 
     {isBuyer && (
@@ -1225,7 +1225,7 @@ async function respondToRefund(formData: FormData) {
       </form>
     )}
 
-    {isSeller && !deliveryDetails && (
+    {iscreator && !deliveryDetails && (
       <div className="mt-7 border border-dashed border-[#173d32]/25 p-6">
         <p className="font-semibold">
           Waiting for delivery details
@@ -1237,7 +1237,7 @@ async function respondToRefund(formData: FormData) {
       </div>
     )}
 
-    {isSeller && deliveryDetails && (
+    {iscreator && deliveryDetails && (
       <div className="mt-7 grid gap-5 border border-[#173d32]/15 p-6 md:grid-cols-2">
         <div>
           <p className="text-xs uppercase tracking-[0.15em] text-[#173d32]/45">
@@ -1291,7 +1291,7 @@ async function respondToRefund(formData: FormData) {
   </div>
 </section>
 
-{isSeller &&
+{iscreator &&
   deliveryDetails &&
   !deliveryDetails.shipped_at &&
   !isPaymentSecured && (
@@ -1313,7 +1313,7 @@ async function respondToRefund(formData: FormData) {
   )}
 
 
-{isSeller &&
+{iscreator &&
   deliveryDetails &&
   !deliveryDetails.shipped_at &&
   isPaymentSecured && (
@@ -1483,7 +1483,7 @@ async function respondToRefund(formData: FormData) {
             })}
           </div>
 
-{isSeller &&
+{iscreator &&
   order.status === "in_progress" &&
   !isPaymentSecured && (
     <div className="mt-9 border border-[#173d32]/20 bg-[#fbf8f1] p-7">
@@ -1503,7 +1503,7 @@ async function respondToRefund(formData: FormData) {
   )}
 
 
-        {isSeller &&
+        {iscreator &&
   order.status === "in_progress" &&
   isPaymentSecured && (
             <div className="mt-9 border border-[#173d32]/20 bg-[#fbf8f1] p-7">
@@ -1605,8 +1605,8 @@ async function respondToRefund(formData: FormData) {
               <option value="Order not as agreed">
                 Order not as agreed
               </option>
-              <option value="Seller unable to complete">
-                Seller unable to complete
+              <option value="creator unable to complete">
+                creator unable to complete
               </option>
               <option value="Delivery issue">
                 Delivery issue
@@ -1648,7 +1648,7 @@ async function respondToRefund(formData: FormData) {
     </div>
   )}
 
-  {isSeller && existingRefund && (
+  {iscreator && existingRefund && (
   <div className="mt-9 border border-[#173d32]/20 bg-[#fbf8f1] p-7">
     <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#b76449]">
       Refund Request
@@ -1695,18 +1695,18 @@ async function respondToRefund(formData: FormData) {
 
       <div>
         <label
-          htmlFor="seller_response"
+          htmlFor="creator_response"
           className="text-sm font-semibold"
         >
           Your response
         </label>
 
         <textarea
-          id="seller_response"
-          name="seller_response"
+          id="creator_response"
+          name="creator_response"
           rows={5}
           defaultValue={
-            existingRefund.seller_response ?? ""
+            existingRefund.creator_response ?? ""
           }
           placeholder="Explain your side or provide relevant details."
           className="mt-2 w-full resize-y border border-[#173d32]/20 bg-white px-4 py-3 outline-none focus:border-[#b76449]"
@@ -1736,7 +1736,7 @@ async function respondToRefund(formData: FormData) {
     href={`/profile/${revieweeId}`}
     className="inline-flex items-center border border-[#173d32]/20 px-5 py-3 text-sm font-semibold transition hover:border-[#b76449] hover:text-[#b76449]"
   >
-    View {revieweeLabel === "seller" ? "Seller" : "Buyer"} Profile 
+    View {revieweeLabel === "creator" ? "creator" : "Buyer"} Profile 
   </Link>
 </div>
 

@@ -34,12 +34,12 @@ type ReceivedProposal = {
   delivery_days: number;
   message: string;
   status: string;
-  seller_id: string;
-  seller_name: string;
-  seller_average_rating: number;
-  seller_total_reviews: number;
-  seller_avatar_url: string | null;
-  seller_is_verified: boolean;
+  creator_id: string;
+  creator_name: string;
+  creator_average_rating: number;
+  creator_total_reviews: number;
+  creator_avatar_url: string | null;
+  creator_is_verified: boolean;
 };
 
 export default async function RequestDetailsPage({
@@ -68,9 +68,9 @@ const { user, profile } = currentUser;
     notFound();
   }
 
-  const isSeller = profile?.role === "seller";
+  const iscreator = profile?.role === "creator";
   const isOwner = request.buyer_id === user.id;
-  const canSubmitProposal = isSeller && !isOwner;
+  const canSubmitProposal = iscreator && !isOwner;
 
   let buyerProfile: PublicProfile | null = null;
   let buyerRating: RatingSummary | null = null;
@@ -135,14 +135,14 @@ const { user, profile } = currentUser;
 
   let existingProposal = null;
 
-  if (isSeller) {
+  if (iscreator) {
     const { data } = await supabase
       .from("proposals")
       .select(
         "id, proposed_price, delivery_days, message, status",
       )
       .eq("request_id", request.id)
-      .eq("seller_id", user.id)
+      .eq("creator_id", user.id)
       .maybeSingle();
 
     existingProposal = data;
@@ -154,7 +154,7 @@ const { user, profile } = currentUser;
     const { data } = await supabase
       .from("proposals")
       .select(
-        "id, proposed_price, delivery_days, message, status, seller_id",
+        "id, proposed_price, delivery_days, message, status, creator_id",
       )
       .eq("request_id", request.id)
       .order("created_at", {
@@ -166,70 +166,70 @@ const { user, profile } = currentUser;
     receivedProposals = await Promise.all(
       proposalRows.map(async (proposal) => {
         const [
-          { data: sellerProfileData },
-          { data: sellerRatingData },
-          { data: sellerAvatarData },
-          { data: sellerVerificationData },
+          { data: creatorProfileData },
+          { data: creatorRatingData },
+          { data: creatorAvatarData },
+          { data: creatorVerificationData },
         ] = await Promise.all([
           supabase
             .rpc("get_public_profile", {
-              p_profile_id: proposal.seller_id,
+              p_profile_id: proposal.creator_id,
             })
             .maybeSingle(),
 
           supabase
             .rpc("get_profile_rating", {
-              p_profile_id: proposal.seller_id,
+              p_profile_id: proposal.creator_id,
             })
             .maybeSingle(),
 
           supabase.rpc("get_public_avatar", {
-            p_profile_id: proposal.seller_id,
+            p_profile_id: proposal.creator_id,
           }),
 
           supabase
             .rpc(
               "get_public_identity_verification",
               {
-                p_profile_id: proposal.seller_id,
+                p_profile_id: proposal.creator_id,
               },
             )
             .maybeSingle(),
         ]);
 
-        const sellerProfile =
-          sellerProfileData as PublicProfile | null;
+        const creatorProfile =
+          creatorProfileData as PublicProfile | null;
 
-        const sellerRating =
-          sellerRatingData as RatingSummary | null;
+        const creatorRating =
+          creatorRatingData as RatingSummary | null;
 
-        const sellerAvatarUrl =
-          sellerAvatarData as string | null;
+        const creatorAvatarUrl =
+          creatorAvatarData as string | null;
 
-        const sellerVerification =
-          sellerVerificationData as
+        const creatorVerification =
+          creatorVerificationData as
             | IdentityVerification
             | null;
 
         return {
           ...proposal,
 
-          seller_name:
-            sellerProfile?.display_name ??
-            "Likha Seller",
+          creator_name:
+            creatorProfile?.display_name ??
+            "Likha creator",
 
-          seller_average_rating: Number(
-            sellerRating?.average_rating ?? 0,
+          creator_average_rating: Number(
+            creatorRating?.average_rating ?? 0,
           ),
 
-          seller_total_reviews: Number(
-            sellerRating?.total_reviews ?? 0,
+          creator_total_reviews: Number(
+            creatorRating?.total_reviews ?? 0,
           ),
 
-          seller_avatar_url: sellerAvatarUrl,
+          creator_avatar_url: creatorAvatarUrl,
 
-          seller_is_verified:
-            sellerVerification?.is_verified ===
+          creator_is_verified:
+            creatorVerification?.is_verified ===
             true,
         };
       }),
@@ -698,7 +698,7 @@ if (error) {
               </p>
 
               <h2 className="mt-3 font-serif text-3xl font-semibold">
-                Mga alok ng sellers
+                Mga alok ng creators
               </h2>
 
               {receivedProposals.length === 0 ? (
@@ -719,18 +719,18 @@ if (error) {
                             <div className="flex items-center gap-3">
                               <div
                                 role="img"
-                                aria-label={`${proposal.seller_name} profile picture`}
+                                aria-label={`${proposal.creator_name} profile picture`}
                                 className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#173d32]/15 bg-[#e9e1d2] bg-cover bg-center font-serif text-xl font-semibold"
                                 style={
-                                  proposal.seller_avatar_url
+                                  proposal.creator_avatar_url
                                     ? {
-                                        backgroundImage: `url(${proposal.seller_avatar_url})`,
+                                        backgroundImage: `url(${proposal.creator_avatar_url})`,
                                       }
                                     : undefined
                                 }
                               >
-                                {!proposal.seller_avatar_url &&
-                                  proposal.seller_name
+                                {!proposal.creator_avatar_url &&
+                                  proposal.creator_name
                                     .charAt(0)
                                     .toUpperCase()}
                               </div>
@@ -739,11 +739,11 @@ if (error) {
                                 <div className="flex flex-wrap items-center gap-2">
                                   <p className="text-sm font-semibold">
                                     {
-                                      proposal.seller_name
+                                      proposal.creator_name
                                     }
                                   </p>
 
-                                  {proposal.seller_is_verified ? (
+                                  {proposal.creator_is_verified ? (
                                     <span
                                       title="Government ID and selfie/liveness were confirmed."
                                       className="inline-flex items-center gap-1 rounded-full bg-[#173d32] px-2.5 py-1 text-[11px] font-semibold text-white"
@@ -756,7 +756,7 @@ if (error) {
                                     </span>
                                   ) : (
                                     <span
-                                      title="This seller has not completed optional identity verification."
+                                      title="This creator has not completed optional identity verification."
                                       className="inline-flex items-center rounded-full border border-[#b76449]/40 bg-[#b76449]/10 px-2.5 py-1 text-[11px] font-semibold text-[#9f503c]"
                                     >
                                       Not Verified
@@ -766,16 +766,16 @@ if (error) {
 
                                 <p className="mt-1 text-sm font-semibold text-[#b76449]">
                                   ★{" "}
-                                  {proposal.seller_average_rating.toFixed(
+                                  {proposal.creator_average_rating.toFixed(
                                     1,
                                   )}
 
                                   <span className="ml-2 font-normal text-[#173d32]/50">
                                     (
                                     {
-                                      proposal.seller_total_reviews
+                                      proposal.creator_total_reviews
                                     }{" "}
-                                    {proposal.seller_total_reviews ===
+                                    {proposal.creator_total_reviews ===
                                     1
                                       ? "review"
                                       : "reviews"}
@@ -808,17 +808,17 @@ if (error) {
                         </p>
 
                         <Link
-                          href={`/profile/${proposal.seller_id}`}
+                          href={`/profile/${proposal.creator_id}`}
                           className="mt-5 inline-flex items-center border border-[#173d32]/20 px-4 py-2.5 text-sm font-semibold transition hover:border-[#b76449] hover:text-[#b76449]"
                         >
-                          View Seller Profile 
+                          View creator Profile 
                         </Link>
 
                         {proposal.status ===
                           "pending" &&
                           request.status ===
                             "open" &&
-                          (proposal.seller_is_verified ? (
+                          (proposal.creator_is_verified ? (
                             <form
                               action={
                                 acceptProposal
@@ -859,7 +859,7 @@ if (error) {
                               <div className="mt-4 border-t border-[#b76449]/25 pt-4">
                                 <p className="text-sm font-semibold text-[#9f503c]">
                                   Hindi pa identity
-                                  verified ang seller
+                                  verified ang creator
                                   na ito.
                                 </p>
 
@@ -870,7 +870,7 @@ if (error) {
                                   ang proposal, tingnan
                                   ang profile, projects,
                                   ratings, at reviews
-                                  ng seller. Panatilihin
+                                  ng creator. Panatilihin
                                   ang messages at
                                   transactions sa loob
                                   ng LIKHA.

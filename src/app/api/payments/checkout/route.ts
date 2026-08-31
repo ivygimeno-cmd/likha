@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       await supabase
         .from("orders")
         .select(
-          "id, buyer_id, seller_id, agreed_price, status",
+          "id, buyer_id, creator_id, agreed_price, status",
         )
         .eq("id", orderId)
         .single();
@@ -281,7 +281,7 @@ export async function POST(request: Request) {
         {
           order_id: order.id,
           buyer_id: order.buyer_id,
-          seller_id: order.seller_id,
+          creator_id: order.creator_id,
           amount: order.agreed_price,
           currency: "PHP",
           status: "pending",

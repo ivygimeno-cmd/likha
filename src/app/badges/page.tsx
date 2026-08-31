@@ -24,11 +24,11 @@ const badges = [
     image: "/badges/founding-50.png",
   },
   {
-    slug: "top-seller",
-    name: "Top Seller",
+    slug: "top-creator",
+    name: "Top creator",
     rarity: "Legendary",
-    description: "Among LIKHA's most successful sellers.",
-    image: "/badges/top-seller.png",
+    description: "Among LIKHA's most successful creators.",
+    image: "/badges/top-creator.png",
   },
   {
     slug: "top-buyer",
@@ -52,11 +52,11 @@ const badges = [
     image: "/badges/project-connoisseur.png",
   },
   {
-    slug: "master-seller",
-    name: "Master Seller",
+    slug: "master-creator",
+    name: "Master creator",
     rarity: "Rare",
     description: "A proven name in the LIKHA marketplace.",
-    image: "/badges/master-seller.png",
+    image: "/badges/master-creator.png",
   },
   {
     slug: "project-collector",
@@ -66,11 +66,11 @@ const badges = [
     image: "/badges/project-collector.png",
   },
   {
-    slug: "rising-seller",
-    name: "Rising Seller",
+    slug: "rising-creator",
+    name: "Rising creator",
     rarity: "Uncommon",
     description: "Building a strong track record on LIKHA.",
-    image: "/badges/rising-seller.png",
+    image: "/badges/rising-creator.png",
   },
   {
     slug: "credit-regular",
@@ -87,11 +87,11 @@ const badges = [
     image: "/badges/first-collector.png",
   },
   {
-    slug: "active-seller",
-    name: "Active Seller",
+    slug: "active-creator",
+    name: "Active creator",
     rarity: "Common",
     description: "Making things happen on LIKHA.",
-    image: "/badges/active-seller.png",
+    image: "/badges/active-creator.png",
   },
   {
     slug: "messenger",
