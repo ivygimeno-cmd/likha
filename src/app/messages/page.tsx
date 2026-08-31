@@ -740,7 +740,8 @@ async function acknowledgeWarning(formData: FormData) {
                     >
                       <div
                         role="img"
-                        aria-label={`${conversation.other_user_name} profile picture`}
+                        aria-label={`${conversation.other_user_name.split(" ")[0]}{" "}
+{conversation.other_user_name.split(" ").slice(-1)[0].charAt(0)}. profile picture`}
                         className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#173d32]/10 bg-cover bg-center font-serif text-xl font-semibold"
                         style={
                           conversation.other_user_avatar_url
@@ -759,7 +760,8 @@ async function acknowledgeWarning(formData: FormData) {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
                           <p className="truncate text-sm font-semibold">
-                            {conversation.other_user_name}
+                           {conversation.other_user_name.split(" ")[0]}{" "}
+{conversation.other_user_name.split(" ").slice(-1)[0].charAt(0)}.
                           </p>
 
                           {conversation.latest_message_at && (
@@ -795,7 +797,8 @@ async function acknowledgeWarning(formData: FormData) {
      <div className="flex min-w-0 items-center gap-3">
          <div
        role="img"
-     aria-label={`${selectedConversation.other_user_name} profile picture`}
+     aria-label={`${selectedConversation.other_user_name.split(" ")[0]}{" "}
+{selectedConversation.other_user_name.split(" ").slice(-1)[0].charAt(0)}. profile picture`}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#173d32]/10 bg-cover bg-center font-serif text-lg font-semibold"
                       style={
          selectedConversation.other_user_avatar_url
@@ -813,7 +816,8 @@ async function acknowledgeWarning(formData: FormData) {
 
                     <div className="min-w-0">
                       <p className="truncate font-semibold">
-                        {selectedConversation.other_user_name}
+                      {selectedConversation.other_user_name.split(" ")[0]}{" "}
+{selectedConversation.other_user_name.split(" ").slice(-1)[0].charAt(0)}.
                       </p>
 
                       <p className="truncate text-xs text-[#173d32]/45">
@@ -921,7 +925,7 @@ async function acknowledgeWarning(formData: FormData) {
                               >
                                 {isOwnMessage
                                   ? "You"
-                                  : selectedConversation.other_user_name}
+                              : `${selectedConversation.other_user_name.split(" ")[0]} ${selectedConversation.other_user_name.split(" ").slice(-1)[0].charAt(0)}.`}
                               </p>
 
                               <div
