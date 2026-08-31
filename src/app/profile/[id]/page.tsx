@@ -829,9 +829,7 @@ export default async function PublicProfilePage({
 
                       <div className="mt-4 flex flex-wrap gap-x-3 text-sm text-[#173d32]/50">
                         <span className="font-semibold text-[#173d32]/70">
-                          {
-                            review.reviewer_name
-                          }
+                        {review.reviewer_name.split(" ")[0]} {review.reviewer_name.split(" ").slice(-1)[0].charAt(0)}.
                         </span>
 
                         <span>•</span>
