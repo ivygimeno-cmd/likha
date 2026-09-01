@@ -411,9 +411,7 @@ const { user } = currentUser;
         <section className="mt-10 rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
           {params.changed === "1" && (
             <div className="mb-7 rounded-2xl border border-green-700/20 bg-green-50 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-green-700">
-                Email confirmed
-              </p>
+             
 
               <p className="mt-2 text-sm leading-6 text-[#173d32]/65">
                 Your email address has been successfully

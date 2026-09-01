@@ -511,47 +511,187 @@ const eventType =
         )
         .maybeSingle();
 
-      if (!existingLedgerEntry) {
+    
+if (!existingLedgerEntry) {
+  const {
+    data: insertedLedgerEntry,
+    error: ledgerInsertError,
+  } = await adminSupabase
+    .from("likha_credit_ledger")
+    .insert({
+      user_id: purchase.user_id,
+      amount: purchase.credits,
+      entry_type: "purchase",
+      entry_key: entryKey,
+      reference_id: String(purchase.id),
+      description:
+        `${purchase.credits} LIKHA Credits purchased (${purchase.bundle_code})`,
+    })
+    .select("id")
+    .single();
+
+  if (ledgerInsertError || !insertedLedgerEntry) {
+    console.error(
+      "Unable to add LIKHA Credits:",
+      ledgerInsertError,
+    );
+
+    return NextResponse.json(
+      {
+        received: false,
+        reason:
+          "Payment marked paid but credits could not be added.",
+      },
+      { status: 500 },
+    );
+  }
+
+  /*
+   * --------------------------------------------------
+   * REFERRAL REWARD
+   * --------------------------------------------------
+   *
+   * The referrer receives 30 Credits only after
+   * the referred user's first qualifying paid purchase.
+   */
+
+  const {
+    data: pendingReferral,
+    error: referralLookupError,
+  } = await adminSupabase
+    .from("referrals")
+    .select(
+      `
+        id,
+        referrer_id,
+        referred_user_id,
+        status
+      `,
+    )
+    .eq(
+      "referred_user_id",
+      purchase.user_id,
+    )
+    .eq(
+      "status",
+      "pending",
+    )
+    .maybeSingle();
+
+  if (referralLookupError) {
+    console.error(
+      "Unable to find pending referral:",
+      referralLookupError,
+    );
+  } else if (pendingReferral) {
+    const referralEntryKey =
+      `referral_bonus:${pendingReferral.id}`;
+
+    const {
+      data: existingReferralLedgerEntry,
+      error: referralLedgerLookupError,
+    } = await adminSupabase
+      .from("likha_credit_ledger")
+      .select("id")
+      .eq(
+        "entry_key",
+        referralEntryKey,
+      )
+      .maybeSingle();
+
+    if (referralLedgerLookupError) {
+      console.error(
+        "Unable to check referral reward:",
+        referralLedgerLookupError,
+      );
+    } else if (!existingReferralLedgerEntry) {
+      const {
+        data: referralLedgerEntry,
+        error: referralLedgerInsertError,
+      } = await adminSupabase
+        .from("likha_credit_ledger")
+        .insert({
+          user_id:
+            pendingReferral.referrer_id,
+
+          amount: 30,
+
+          entry_type:
+            "referral_bonus",
+
+          entry_key:
+            referralEntryKey,
+
+          reference_id:
+            String(purchase.id),
+
+          description:
+            "30 LIKHA Referral Credits",
+        })
+        .select("id")
+        .single();
+
+      if (referralLedgerInsertError) {
+        console.error(
+          "Unable to add referral bonus:",
+          referralLedgerInsertError,
+        );
+      } else if (referralLedgerEntry) {
         const {
-          error: ledgerInsertError,
+          error: referralUpdateError,
         } = await adminSupabase
-          .from("likha_credit_ledger")
-          .insert({
-            user_id:
-              purchase.user_id,
+          .from("referrals")
+          .update({
+            status: "rewarded",
 
-            amount:
-              purchase.credits,
+            qualifying_purchase_ledger_id:
+              String(insertedLedgerEntry.id),
 
-            entry_type:
-              "credit_purchase",
-
-            entry_key:
-              entryKey,
-
-            reference_id:
-              String(purchase.id),
-
-            description:
-              `${purchase.credits} LIKHA Credits purchased (${purchase.bundle_code})`,
-          });
-
-        if (ledgerInsertError) {
-          console.error(
-            "Unable to add LIKHA Credits:",
-            ledgerInsertError,
+            rewarded_at:
+              new Date().toISOString(),
+          })
+          .eq(
+            "id",
+            pendingReferral.id,
+          )
+          .eq(
+            "status",
+            "pending",
           );
 
-          return NextResponse.json(
+        if (referralUpdateError) {
+          console.error(
+            "Unable to mark referral as rewarded:",
+            referralUpdateError,
+          );
+        } else {
+          console.log(
+            "LIKHA referral reward completed:",
             {
-              received: false,
-              reason:
-                "Payment marked paid but credits could not be added.",
+              referralId:
+                pendingReferral.id,
+
+              referrerId:
+                pendingReferral.referrer_id,
+
+              referredUserId:
+                pendingReferral.referred_user_id,
+
+              reward: 30,
+
+              purchaseId:
+                purchase.id,
+
+              purchaseLedgerId:
+                insertedLedgerEntry.id,
             },
-            { status: 500 },
           );
         }
       }
+    }
+  }
+}
+      
 
       console.log(
         "LIKHA Credits purchase completed:",

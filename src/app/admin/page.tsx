@@ -294,7 +294,6 @@ const sortedPendingAccountChanges = [
   );
 });
 
-
 const {
   data: supportRequestsData,
   error: supportRequestsError,
@@ -316,6 +315,8 @@ const {
     ascending: false,
   });
 
+  
+
 if (supportRequestsError) {
   throw new Error(
     `Hindi makuha ang support requests: ${supportRequestsError.message}`,
@@ -333,11 +334,11 @@ const newSupportRequests =
 const latestSupportRequests =
   supportRequests.slice(0, 8);
 
-  type AdminRefundRequest = {
+type AdminRefundRequest = {
   id: string;
   order_id: string;
   buyer_id: string;
-  creator_id: string;
+  seller_id: string;
   reason: string;
   amount: number | string | null;
   status: string;
@@ -349,18 +350,17 @@ const {
   error: refundRequestsError,
 } = await supabase
   .from("refund_requests")
-  .select(
-    `
-      id,
-      order_id,
-      buyer_id,
-      creator_id,
-      reason,
-      amount,
-      status,
-      created_at
-    `,
-  )
+ .select(
+  `
+  id,
+  order_id,
+  buyer_id,
+  reason,
+  amount,
+  status,
+  created_at
+  `,
+)
   .order("created_at", {
     ascending: false,
   });

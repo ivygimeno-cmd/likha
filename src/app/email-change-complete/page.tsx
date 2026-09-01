@@ -49,9 +49,7 @@ export default async function EmailChangeCompletePage({
             </>
           ) : (
             <>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-700">
-                Email confirmed
-              </p>
+             
 
               <h1 className="mt-4 font-serif text-4xl font-normal">
                 Your email has been changed.

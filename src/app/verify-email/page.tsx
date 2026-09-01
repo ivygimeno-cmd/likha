@@ -135,9 +135,7 @@ function VerifyEmailContent() {
             ✓
           </div>
 
-          <p className="mt-7 text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449]">
-            Email confirmed
-          </p>
+        
 
           <h1 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
             Verified na ang iyong email.
@@ -177,9 +175,7 @@ function VerifyEmailContent() {
         </Link>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#d9c6a5]">
-            Email verification
-          </p>
+        
 
           <h1 className="mt-5 max-w-xl font-serif text-6xl leading-tight font-semibold">
             Isang hakbang bago magsimula.
@@ -206,9 +202,7 @@ function VerifyEmailContent() {
             LIKHA
           </Link>
 
-          <p className="mt-10 text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449] lg:mt-0">
-            Check your email
-          </p>
+          
 
           <h2 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
             Ilagay ang verification code.
