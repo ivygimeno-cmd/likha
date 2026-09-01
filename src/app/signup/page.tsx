@@ -231,9 +231,7 @@ export default function SignUpPage() {
         </Link>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#d9c6a5]">
-            Sumali sa Likha
-          </p>
+         
 
           <h1 className="mt-5 max-w-xl font-serif text-6xl leading-tight font-semibold">
             May puwang para sa bawat malikhaing
@@ -275,9 +273,7 @@ export default function SignUpPage() {
             LIKHA
           </Link>
 
-          <p className="mt-10 text-sm font-semibold uppercase tracking-[0.2em] text-[#b76449] lg:mt-0">
-            Gumawa ng account
-          </p>
+        
 
           <h2 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
             Simulan ang iyong Likha journey.
