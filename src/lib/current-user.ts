@@ -17,8 +17,8 @@ export const getCurrentUser = cache(async () => {
       supabase
         .from("profiles")
         .select(
-          "role, full_name, business_name, avatar_url, account_tier, vip_expires_at",
-        )
+  "role, full_name, business_name, avatar_url, account_tier, vip_expires_at, referral_code",
+)
         .eq("id", user.id)
         .maybeSingle(),
 

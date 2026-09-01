@@ -427,15 +427,24 @@ const { data: notificationsData } =
                   {displayName}
                 </p>
 
-                <p className="mt-1 truncate text-xs text-[#173d32]/50">
-                  {user.email}
-                </p>
+            <p className="mt-1 truncate text-xs text-[#173d32]/50">
+  {user.email}
+</p>
 
-                <p className="mt-1 text-xs font-semibold text-[#b76449]">
-                  {iscreator
-                    ? "creator workspace"
-                    : "Buyer workspace"}
-                </p>
+{profile?.referral_code && (
+  <p className="mt-2 text-xs text-[#173d32]/55">
+    <span className="font-semibold">Referral code</span>{" "}
+    <span className="font-mono font-semibold text-[#b76449]">
+      {profile.referral_code}
+    </span>
+  </p>
+)}
+
+<p className="mt-1 text-xs font-semibold text-[#b76449]">
+  {iscreator
+    ? "creator workspace"
+    : "Buyer workspace"}
+</p>
               </div>
 
               {/* Menu */}
