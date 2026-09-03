@@ -106,7 +106,7 @@ export default async function Home() {
           
 
             <h2 className="mt-5 max-w-md font-serif text-4xl leading-tight font-semibold sm:text-5xl">
-              Isang request. Maraming malikhaing posibilidad.
+              Isang request. Maraming pwedeng gawin.
             </h2>
 
             <div className="mt-12 space-y-4">
