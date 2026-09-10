@@ -866,11 +866,9 @@ export default async function PublicProfilePage({
                         )}
 
                         {isOwnProfile && (
-                          <>
+                          <div className="mt-4 flex flex-wrap items-center gap-2">
                             <FeatureProjectButton
-                              projectId={
-                                project.id
-                              }
+                              projectId={project.id}
                               isVip={isVip}
                               isFeatured={featuredProjectIds.has(
                                 project.id,
@@ -878,12 +876,8 @@ export default async function PublicProfilePage({
                             />
 
                             <PortfolioProjectActions
-                              projectId={
-                                project.id
-                              }
-                              title={
-                                project.title
-                              }
+                              projectId={project.id}
+                              title={project.title}
                               description={
                                 project.description
                               }
@@ -894,7 +888,7 @@ export default async function PublicProfilePage({
                                 project.image_path_2
                               }
                             />
-                          </>
+                          </div>
                         )}
                       </div>
                     </article>

@@ -86,6 +86,7 @@ export default function PortfolioProjectActions({
 
   function closeDelete() {
     if (loading) return;
+
     setDeleting(false);
     setErrorMessage("");
   }
@@ -371,22 +372,54 @@ export default function PortfolioProjectActions({
 
   return (
     <>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={openEdit}
-          className="rounded-lg border border-[#173d32]/20 px-4 py-2 text-sm font-semibold text-[#173d32] transition hover:border-[#b76449] hover:text-[#b76449]"
+          aria-label="Edit project"
+          title="Edit project"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#173d32]/15 text-[#173d32]/65 transition hover:border-[#b76449] hover:text-[#b76449]"
         >
-          Edit
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+          </svg>
         </button>
 
         <button
           type="button"
           onClick={openDelete}
           disabled={loading}
-          className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:border-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label="Delete project"
+          title="Delete project"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-red-200/80 text-red-600 transition hover:border-red-400 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Delete
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16" />
+            <path d="M9 7V4h6v3" />
+            <path d="M8 11v6" />
+            <path d="M12 11v6" />
+            <path d="M16 11v6" />
+            <path d="M6 7l1 13h10l1-13" />
+          </svg>
         </button>
 
         {message && (
