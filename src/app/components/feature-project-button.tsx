@@ -10,6 +10,8 @@ type FeatureProjectButtonProps = {
   isFeatured: boolean;
 };
 
+const MAX_FEATURED_PROJECTS = 3;
+
 export default function FeatureProjectButton({
   projectId,
   isVip,
@@ -24,6 +26,40 @@ export default function FeatureProjectButton({
   async function handleFeature() {
     setLoading(true);
     setError("");
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser();
+
+    const user = userData.user;
+
+    if (userError || !user) {
+      setError("Mag-sign in ulit bago mag-feature ng project.");
+      setLoading(false);
+      return;
+    }
+
+    const { count, error: countError } = await supabase
+      .from("featured_projects")
+      .select("project_id", {
+        count: "exact",
+        head: true,
+      })
+      .eq("profile_id", user.id)
+      .eq("is_active", true);
+
+    if (countError) {
+      setError(countError.message);
+      setLoading(false);
+      return;
+    }
+
+    if ((count ?? 0) >= MAX_FEATURED_PROJECTS) {
+      setError(
+        `Maximum na ${MAX_FEATURED_PROJECTS} featured projects para sa VIP.`,
+      );
+      setLoading(false);
+      return;
+    }
 
     const { error: featureError } = await supabase.rpc(
       "feature_portfolio_project",

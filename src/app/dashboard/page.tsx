@@ -6,37 +6,51 @@ import AvatarUpload from "./avatar-upload";
 import AuthenticatedNavbar from "@/app/components/authenticated-navbar";
 
 export default async function DashboardPage() {
- const supabase = await createClient();
+  const supabase = await createClient();
 
-const currentUser = await getCurrentUser();
+  const currentUser = await getCurrentUser();
 
-if (!currentUser) {
-  redirect("/login");
-}
+  if (!currentUser) {
+    redirect("/login");
+  }
 
-const { user, profile, isAdmin } = currentUser;
-
-const { data: verificationData } = await supabase
-  .rpc("get_public_identity_verification", {
-    p_profile_id: user.id,
-  })
-  .maybeSingle();
-
-  const verification = verificationData as {
-    is_verified: boolean;
-  } | null;
-
-  const isIdentityVerified =
-    verification?.is_verified === true;
+  const { user, profile, isAdmin } = currentUser;
 
   const role = profile?.role ?? "buyer";
   const iscreator = role === "creator";
 
+  let requestQuery = supabase
+    .from("project_requests")
+    .select(
+      "id, title, product_type, minimum_budget, maximum_budget, deadline, location, status, created_at",
+    )
+    .order("created_at", { ascending: false });
+
+  if (iscreator) {
+    requestQuery = requestQuery
+      .eq("status", "open")
+      .neq("buyer_id", user.id);
+  }
+
   const [
+    { data: verificationData },
     { data: publicProfileData },
     { data: ratingData },
     { data: creditBalanceData },
+    {
+      data: requests,
+      error: requestsError,
+    },
+    { count: proposalCount },
+    { count: activeOrderCount },
+    { count: completedOrderCount },
   ] = await Promise.all([
+    supabase
+      .rpc("get_public_identity_verification", {
+        p_profile_id: user.id,
+      })
+      .maybeSingle(),
+
     supabase
       .rpc("get_public_profile", {
         p_profile_id: user.id,
@@ -52,7 +66,36 @@ const { data: verificationData } = await supabase
     supabase
       .rpc("get_my_likha_credit_balance")
       .maybeSingle(),
+
+    requestQuery.limit(6),
+
+    supabase
+      .from("proposals")
+      .select("id", { count: "exact", head: true }),
+
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["in_progress", "submitted"]),
+
+    supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "completed"),
   ]);
+
+  if (requestsError) {
+    throw new Error(
+      `Hindi ma-load ang project requests: ${requestsError.message}`,
+    );
+  }
+
+  const verification = verificationData as {
+    is_verified: boolean;
+  } | null;
+
+  const isIdentityVerified =
+    verification?.is_verified === true;
 
   const publicProfile = publicProfileData as {
     display_name: string;
@@ -90,241 +133,184 @@ const { data: verificationData } = await supabase
     creditBalanceResult?.balance ?? 0,
   );
 
-  let requestQuery = supabase
-    .from("project_requests")
-    .select(
-      "id, title, product_type, minimum_budget, maximum_budget, deadline, location, status, created_at",
-    )
-    .order("created_at", { ascending: false });
-
-  if (iscreator) {
-    requestQuery = requestQuery
-      .eq("status", "open")
-      .neq("buyer_id", user.id);
-  }
-
-  const [
-    {
-      data: requests,
-      error: requestsError,
-    },
-    { data: proposals },
-    { data: orders },
-  ] = await Promise.all([
-    requestQuery.limit(6),
-
-    supabase
-      .from("proposals")
-      .select("id, status"),
-
-    supabase
-      .from("orders")
-      .select("id, status"),
-  ]);
-
-  if (requestsError) {
-    throw new Error(
-      `Hindi ma-load ang project requests: ${requestsError.message}`,
-    );
-  }
-
   const openRequestCount = iscreator
-    ? (requests?.length ?? 0)
+    ? requests?.length ?? 0
     : (requests ?? []).filter(
         (request) => request.status === "open",
       ).length;
 
-  const activeOrderCount = (orders ?? []).filter(
-    (order) =>
-      order.status === "in_progress" ||
-      order.status === "submitted",
-  ).length;
-
-  const completedOrderCount = (orders ?? []).filter(
-    (order) => order.status === "completed",
-  ).length;
-
-
+  const proposalsCount = proposalCount ?? 0;
+  const activeOrders = activeOrderCount ?? 0;
+  const completedOrders = completedOrderCount ?? 0;
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
       <AuthenticatedNavbar />
 
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+        <section className="border-b border-[#173d32]/15 pb-10">
+          <div>
+            <h1 className="font-serif text-5xl font-semibold">
+              Magandang araw
+              {profile?.full_name
+                ? `, ${profile.full_name.split(" ")[0]}`
+                : ""}
+              .
+            </h1>
 
-<section className="border-b border-[#173d32]/15 pb-10">
-  {/* Dashboard heading */}
-  <div>
-    <h1 className="font-serif text-5xl font-semibold">
-      Magandang araw
-      {profile?.full_name
-        ? `, ${profile.full_name.split(" ")[0]}`
-        : ""}
-      .
-    </h1>
-
-    <p className="mt-4 text-[#173d32]/65">
-      {iscreator
-        ? "Tingnan ang mga bagong request na maaari mong gawan ng proposal."
-        : "Pamahalaan ang iyong custom requests at creator proposals."}
-    </p>
-  </div>
-
-  {/* Main dashboard area */}
-  <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-start">
-    {/* LEFT SIDE */}
-    <div className="flex flex-col">
-      {/* Profile */}
-      <div className="flex items-start gap-6">
-        <AvatarUpload
-          userId={user.id}
-          currentAvatarUrl={profile?.avatar_url ?? null}
-          displayName={dashboardDisplayName}
-          editable={false}
-          size="dashboard"
-        />
-
-        <div className="min-w-0 flex-1">
-          {/* Name + Verified badge */}
-          <div className="flex flex-wrap items-center gap-4">
-            <h2 className="font-serif text-5xl font-semibold">
-              {dashboardDisplayName}
-            </h2>
-
-            {isIdentityVerified && (
-              <span
-                title="Government ID and selfie/liveness were successfully confirmed."
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#789b82] px-3 py-2 text-xs font-semibold text-white"
-              >
-                <span aria-hidden="true">✓</span>
-                Identity Verified
-              </span>
-            )}
-          </div>
-
-          {/* Rating */}
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            <div
-              className="text-xl tracking-[0.08em] text-[#b76449]"
-              aria-label={`${averageRating} out of 5 stars`}
-            >
-              {"★".repeat(roundedRating)}
-
-              <span className="text-[#173d32]/15">
-                {"★".repeat(5 - roundedRating)}
-              </span>
-            </div>
-
-            <p className="text-sm font-semibold">
-              {averageRating.toFixed(1)}
-
-              <span className="ml-1 font-normal text-[#173d32]/50">
-                ({totalReviews}{" "}
-                {totalReviews === 1 ? "review" : "reviews"})
-              </span>
-            </p>
-          </div>
-
-          {/* Credits */}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <div className="min-w-56 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
-              Available credits
-              </p>
-
-              <p className="mt-1 font-serif text-3xl font-semibold">
-                {creditBalance.toLocaleString("en-PH")}
-              </p>
-            </div>
-
-            <Link
-              href="/credits"
-              className="inline-flex rounded-lg bg-[#173d32] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#245646]"
-            >
-              Bumili ng Credits
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* RIGHT SIDE */}
-   <div className="flex flex-col gap-5 lg:-mt-25">
-      {/* Action buttons */}
-  <div className="ml-auto flex w-[225px] flex-col gap-4">
-       {isAdmin === true && (
-    <Link
-      href="/admin"
- className="rounded-md border border-[#173d32]/20 bg-[#fbf8f1] px-7 py-4 text-center font-semibold text-[#173d32] transition hover:border-[#173d32]/40 hover:bg-white"
- 
- >
-   Admin Panel
-    </Link>
-  )}
-
-  <Link
-    href={`/profile/${user.id}`}
-className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
- >
-  Tingnan ang profile
-  </Link>
-
-  <Link
-    href={iscreator ? "/marketplace" : "/request"}
-    className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
-  >
-    {iscreator
-      ? "Maghanap ng project"
-      : "Mag-post ng request"}
-  </Link>
-</div>
-
-      {/* Dashboard statistics */}
-  <div className="mt-6 border border-[#173d32]/20">
-        <div className="grid grid-cols-3 divide-x divide-[#173d32]/20">
-          <div className="px-6 py-7">
-            <p className="text-sm text-[#173d32]/55">
-              {iscreator ? "Available na projects" : "Active orders"}
-            </p>
-
-            <p className="mt-6 font-serif text-4xl font-semibold">
-              {iscreator ? openRequestCount : activeOrderCount}
-            </p>
-          </div>
-
-          <div className="px-6 py-7">
-            <p className="text-sm text-[#173d32]/55">
+            <p className="mt-4 text-[#173d32]/65">
               {iscreator
-                ? "Mga sinend mong offer"
-                : "Mga natangap mong proposal"}
-            </p>
-
-            <p className="mt-6 font-serif text-4xl font-semibold">
-              {proposals?.length ?? 0}
+                ? "Tingnan ang mga bagong request na maaari mong gawan ng proposal."
+                : "Pamahalaan ang iyong custom requests at creator proposals."}
             </p>
           </div>
 
-          <div className="px-6 py-7">
-            <p className="text-sm text-[#173d32]/55">
-             Mga nakumpletong orders
-            </p>
+          <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-start">
+            <div className="flex flex-col">
+              <div className="flex items-start gap-6">
+                <AvatarUpload
+                  userId={user.id}
+                  currentAvatarUrl={profile?.avatar_url ?? null}
+                  displayName={dashboardDisplayName}
+                  editable={false}
+                  size="dashboard"
+                />
 
-            <p className="mt-6 font-serif text-4xl font-semibold">
-              {completedOrderCount}
-            </p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <h2 className="font-serif text-5xl font-semibold">
+                      {dashboardDisplayName}
+                    </h2>
+
+                    {isIdentityVerified && (
+                      <span
+                        title="Government ID and selfie/liveness were successfully confirmed."
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#789b82] px-3 py-2 text-xs font-semibold text-white"
+                      >
+                        <span aria-hidden="true">✓</span>
+                        Identity Verified
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <div
+                      className="text-xl tracking-[0.08em] text-[#b76449]"
+                      aria-label={`${averageRating} out of 5 stars`}
+                    >
+                      {"★".repeat(roundedRating)}
+
+                      <span className="text-[#173d32]/15">
+                        {"★".repeat(5 - roundedRating)}
+                      </span>
+                    </div>
+
+                    <p className="text-sm font-semibold">
+                      {averageRating.toFixed(1)}
+
+                      <span className="ml-1 font-normal text-[#173d32]/50">
+                        ({totalReviews}{" "}
+                        {totalReviews === 1 ? "review" : "reviews"})
+                      </span>
+                    </p>
+                  </div>
+
+                  <div className="mt-8 flex flex-wrap items-center gap-4">
+                    <div className="min-w-56 rounded-xl border border-[#173d32]/15 bg-[#fbf8f1] px-6 py-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#173d32]/45">
+                        Available credits
+                      </p>
+
+                      <p className="mt-1 font-serif text-3xl font-semibold">
+                        {creditBalance.toLocaleString("en-PH")}
+                      </p>
+                    </div>
+
+                    <Link
+                      href="/credits"
+                      className="inline-flex rounded-lg bg-[#173d32] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#245646]"
+                    >
+                      Bumili ng Credits
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-5 lg:-mt-25">
+              <div className="ml-auto flex w-[225px] flex-col gap-4">
+                {isAdmin === true && (
+                  <Link
+                    href="/admin"
+                    className="rounded-md border border-[#173d32]/20 bg-[#fbf8f1] px-7 py-4 text-center font-semibold text-[#173d32] transition hover:border-[#173d32]/40 hover:bg-white"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+
+                <Link
+                  href={`/profile/${user.id}`}
+                  className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#245646]"
+                >
+                  Tingnan ang profile
+                </Link>
+
+                <Link
+                  href={iscreator ? "/marketplace" : "/request"}
+                  className="rounded-md bg-[#b76449] px-7 py-4 text-center font-semibold text-white transition hover:bg-[#9f503c]"
+                >
+                  {iscreator
+                    ? "Maghanap ng project"
+                    : "Mag-post ng request"}
+                </Link>
+              </div>
+
+              <div className="mt-6 border border-[#173d32]/20">
+                <div className="grid grid-cols-3 divide-x divide-[#173d32]/20">
+                  <div className="px-6 py-7">
+                    <p className="text-sm text-[#173d32]/55">
+                      {iscreator
+                        ? "Available na projects"
+                        : "Active orders"}
+                    </p>
+
+                    <p className="mt-6 font-serif text-4xl font-semibold">
+                      {iscreator
+                        ? openRequestCount
+                        : activeOrders}
+                    </p>
+                  </div>
+
+                  <div className="px-6 py-7">
+                    <p className="text-sm text-[#173d32]/55">
+                      {iscreator
+                        ? "Mga sinend mong offer"
+                        : "Mga natangap mong proposal"}
+                    </p>
+
+                    <p className="mt-6 font-serif text-4xl font-semibold">
+                      {proposalsCount}
+                    </p>
+                  </div>
+
+                  <div className="px-6 py-7">
+                    <p className="text-sm text-[#173d32]/55">
+                      Mga nakumpletong orders
+                    </p>
+
+                    <p className="mt-6 font-serif text-4xl font-semibold">
+                      {completedOrders}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
+        </section>
 
         <section className="mt-14">
           <div className="flex items-end justify-between">
             <div>
-
-
               <h2 className="mt-2 font-serif text-4xl font-semibold">
                 {iscreator
                   ? "Mga naghahanap ng creator"
@@ -351,7 +337,9 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
                 href={iscreator ? "/marketplace" : "/request"}
                 className="mt-7 inline-block font-semibold text-[#b76449]"
               >
-                {iscreator ? "Pumunta sa Marketplace " : "Magpagawa ngayon "}
+                {iscreator
+                  ? "Pumunta sa Marketplace "
+                  : "Magpagawa ngayon "}
               </Link>
             </div>
           ) : (
@@ -392,11 +380,14 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
                     </p>
 
                     <p className="mt-1 font-semibold">
-                      {new Date(request.deadline).toLocaleDateString("en-PH", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {new Date(request.deadline).toLocaleDateString(
+                        "en-PH",
+                        {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        },
+                      )}
                     </p>
                   </div>
 
@@ -404,7 +395,7 @@ className="rounded-md bg-[#173d32] px-7 py-4 text-center font-semibold text-whit
                     href={`/requests/${request.id}`}
                     className="font-semibold text-[#b76449]"
                   >
-                    Tingnan 
+                    Tingnan
                   </Link>
                 </article>
               ))}

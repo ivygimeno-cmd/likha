@@ -7,6 +7,7 @@ import AvatarUpload from "@/app/dashboard/avatar-upload";
 import FollowButton from "./follow-button";
 import FeatureProjectButton from "@/app/components/feature-project-button";
 import ProjectDescription from "./project-description";
+import PortfolioProjectActions from "./portfolio-project-actions";
 
 type PageProps = {
   params: Promise<{
@@ -43,6 +44,7 @@ type PortfolioProject = {
   title: string;
   description: string;
   image_path: string | null;
+  image_path_2: string | null;
   created_at: string;
 };
 
@@ -63,9 +65,11 @@ type VipProfile = {
   vip_expires_at: string | null;
 };
 
-type ProfileBadgeInfo = {
+type ProfileMetadata = {
   created_at: string;
   account_tier: "standard" | "vip" | string | null;
+  vip_expires_at: string | null;
+  is_admin_badge: boolean | null;
 };
 
 type AdminBadgeProfile = {
@@ -95,9 +99,6 @@ export default async function PublicProfilePage({
     redirect("/login");
   }
 
-  /*
-   * PUBLIC PROFILE
-   */
   const { data: profileData } = await supabase
     .rpc("get_public_profile", {
       p_profile_id: id,
@@ -110,15 +111,11 @@ export default async function PublicProfilePage({
     notFound();
   }
 
-  /*
-   * LOAD PROFILE DATA
-   */
   const [
     { data: avatarData },
     { data: ratingData },
     { data: verificationData },
     { data: reviewData },
-    { data: profileBadgesData },
     { data: earnedBadgesData },
     { data: projectData },
     { data: featuredProjectData },
@@ -127,128 +124,83 @@ export default async function PublicProfilePage({
     { count: completedProjects },
     { count: purchasedProjects },
     { data: creditBalanceData },
-    { data: vipProfileData },
-    { data: adminBadgeData },
+    { data: profileMetadataData },
   ] = await Promise.all([
-    /*
-     * Avatar
-     */
     supabase.rpc("get_public_avatar", {
       p_profile_id: id,
     }),
 
-    /*
-     * Rating
-     */
     supabase
       .rpc("get_profile_rating", {
         p_profile_id: id,
       })
       .maybeSingle(),
 
-    /*
-     * Identity verification
-     */
     supabase
       .rpc("get_public_identity_verification", {
         p_profile_id: id,
       })
       .maybeSingle(),
 
-    /*
-     * Reviews
-     */
     supabase.rpc("get_profile_reviews", {
       p_profile_id: id,
     }),
 
-    /*
-     * Existing badge/profile information
-     */
-    supabase
-      .rpc("get_public_profile_badges", {
-        p_profile_id: id,
-      })
-      .maybeSingle(),
-
-    /*
-     * Earned badges
-     */
     supabase.rpc("get_public_profile_badges", {
       p_profile_id: id,
     }),
 
-    /*
-     * Portfolio projects
-     */
     supabase
       .from("portfolio_projects")
       .select(
-        "id, title, description, image_path, created_at",
+        "id, title, description, image_path, image_path_2, created_at",
       )
       .eq("owner_id", id)
       .order("created_at", {
         ascending: false,
-      }),
+      })
+      .limit(6),
 
-    /*
-     * Featured projects
-     */
     supabase
       .from("featured_projects")
       .select("project_id")
       .eq("profile_id", id)
       .eq("is_active", true),
 
-    /*
-     * Followers
-     */
     supabase
       .from("follows")
-      .select("*", {
+      .select("id", {
         count: "exact",
         head: true,
       })
       .eq("following_id", id),
 
-    /*
-     * Following
-     */
     supabase
       .from("follows")
-      .select("*", {
+      .select("id", {
         count: "exact",
         head: true,
       })
       .eq("follower_id", id),
 
-    /*
-     * Completed creator projects
-     */
     supabase
       .from("orders")
-      .select("*", {
+      .select("id", {
         count: "exact",
         head: true,
       })
       .eq("creator_id", id)
       .eq("status", "completed"),
 
-    /*
-     * Purchased projects
-     */
     supabase
       .from("orders")
-      .select("*", {
+      .select("id", {
         count: "exact",
         head: true,
       })
       .eq("buyer_id", id)
       .eq("status", "completed"),
 
-    /*
-     * Credits — own profile only
-     */
     user.id === id
       ? supabase
           .rpc("get_my_likha_credit_balance")
@@ -258,32 +210,18 @@ export default async function PublicProfilePage({
           error: null,
         }),
 
-    /*
-     * VIP
-     */
     supabase
       .from("profiles")
-      .select("account_tier, vip_expires_at")
-      .eq("id", id)
-      .maybeSingle(),
-
-    /*
-     * ADMIN BADGE
-     *
-     * IMPORTANT:
-     * We read is_admin_badge directly from profiles.
-     */
-    supabase
-      .from("profiles")
-      .select("is_admin_badge")
+      .select(
+        "created_at, account_tier, vip_expires_at, is_admin_badge",
+      )
       .eq("id", id)
       .maybeSingle(),
   ]);
 
   const avatarUrl = avatarData as string | null;
 
-  const rating =
-    ratingData as RatingSummary | null;
+  const rating = ratingData as RatingSummary | null;
 
   const identityVerification =
     verificationData as IdentityVerification | null;
@@ -294,42 +232,36 @@ export default async function PublicProfilePage({
   const reviews =
     (reviewData ?? []) as ProfileReview[];
 
-  const profileBadges =
-    profileBadgesData as ProfileBadgeInfo | null;
+  const profileMetadata =
+    profileMetadataData as ProfileMetadata | null;
 
   const vipProfile =
-    vipProfileData as VipProfile | null;
+    profileMetadata as VipProfile | null;
 
-  /*
-   * ADMIN BADGE
-   *
-   * This now comes directly from:
-   * profiles.is_admin_badge
-   */
   const adminBadge =
-    adminBadgeData as AdminBadgeProfile | null;
+    profileMetadata as AdminBadgeProfile | null;
 
   const hasAdminBadge =
     adminBadge?.is_admin_badge === true;
 
-  /*
-   * EARNED BADGES
-   */
   const earnedBadges =
     (earnedBadgesData ?? []) as EarnedBadge[];
 
   const visibleBadges =
-    earnedBadges.slice(0, 6);
+    earnedBadges
+      .sort(
+        (a, b) =>
+          (rarityOrder[a.rarity] ?? 99) -
+          (rarityOrder[b.rarity] ?? 99),
+      )
+      .slice(0, 6);
 
   const hasMoreBadges =
     earnedBadges.length > 6;
 
-  /*
-   * ACCOUNT AGE
-   */
   const profileCreatedAt =
-    profileBadges?.created_at
-      ? new Date(profileBadges.created_at)
+    profileMetadata?.created_at
+      ? new Date(profileMetadata.created_at)
       : null;
 
   let accountAgeLabel: string | null = null;
@@ -377,9 +309,6 @@ export default async function PublicProfilePage({
             }m old`;
   }
 
-  /*
-   * VIP
-   */
   const isVip =
     vipProfile?.account_tier === "vip" &&
     vipProfile?.vip_expires_at !== null &&
@@ -387,30 +316,30 @@ export default async function PublicProfilePage({
       vipProfile.vip_expires_at,
     ).getTime() > Date.now();
 
-  /*
-   * PROJECTS
-   */
   const projects = (
     (projectData ?? []) as PortfolioProject[]
   ).map((project) => {
     const imageUrl = project.image_path
       ? supabase.storage
           .from("portfolio-images")
-          .getPublicUrl(
-            project.image_path,
-          )
+          .getPublicUrl(project.image_path)
+          .data.publicUrl
+      : null;
+
+    const imageUrl2 = project.image_path_2
+      ? supabase.storage
+          .from("portfolio-images")
+          .getPublicUrl(project.image_path_2)
           .data.publicUrl
       : null;
 
     return {
       ...project,
       imageUrl,
+      imageUrl2,
     };
   });
 
-  /*
-   * FEATURED PROJECTS
-   */
   const featuredProjectIds =
     new Set(
       (featuredProjectData ?? []).map(
@@ -418,9 +347,6 @@ export default async function PublicProfilePage({
       ),
     );
 
-  /*
-   * RATINGS
-   */
   const averageRating = Number(
     rating?.average_rating ?? 0,
   );
@@ -437,24 +363,15 @@ export default async function PublicProfilePage({
     ),
   );
 
-  /*
-   * AVATAR INITIAL
-   */
   const avatarInitial =
     profile.display_name
       .trim()
       .charAt(0)
       .toUpperCase() || "L";
 
-  /*
-   * OWN PROFILE
-   */
   const isOwnProfile =
     user.id === profile.id;
 
-  /*
-   * CREDITS
-   */
   let creditBalance = 0;
 
   if (isOwnProfile) {
@@ -519,7 +436,6 @@ export default async function PublicProfilePage({
                         <span aria-hidden="true">
                           ✓
                         </span>
-
                         Identity Verified
                       </span>
                     )}
@@ -570,10 +486,7 @@ export default async function PublicProfilePage({
                         >
                           ♝
                         </span>
-
-                        <span>
-                          VIP
-                        </span>
+                        <span>VIP</span>
                       </span>
                     )}
 
@@ -585,7 +498,6 @@ export default async function PublicProfilePage({
                         <span aria-hidden="true">
                           ♛
                         </span>
-
                         LIKHA ADMIN
                       </span>
                     )}
@@ -729,12 +641,8 @@ export default async function PublicProfilePage({
                             <div className="mx-auto flex h-[100px] w-[100px] items-center justify-center">
                               {badge.image_url ? (
                                 <img
-                                  src={
-                                    badge.image_url
-                                  }
-                                  alt={
-                                    badge.name
-                                  }
+                                  src={badge.image_url}
+                                  alt={badge.name}
                                   className="h-full w-full object-contain drop-shadow-[0_5px_8px_rgba(23,61,50,0.12)] transition duration-300 group-hover:scale-105"
                                 />
                               ) : (
@@ -752,9 +660,7 @@ export default async function PublicProfilePage({
 
                             {badge.description && (
                               <p className="mx-auto mt-1 line-clamp-2 max-w-[120px] text-[10px] leading-4 text-[#173d32]/45">
-                                {
-                                  badge.description
-                                }
+                                {badge.description}
                               </p>
                             )}
                           </div>
@@ -815,8 +721,7 @@ export default async function PublicProfilePage({
 
                         <span className="text-[#173d32]/15">
                           {"★".repeat(
-                            5 -
-                              review.rating,
+                            5 - review.rating,
                           )}
                         </span>
                       </div>
@@ -829,7 +734,14 @@ export default async function PublicProfilePage({
 
                       <div className="mt-4 flex flex-wrap gap-x-3 text-sm text-[#173d32]/50">
                         <span className="font-semibold text-[#173d32]/70">
-                        {review.reviewer_name.split(" ")[0]} {review.reviewer_name.split(" ").slice(-1)[0].charAt(0)}.
+                          {review.reviewer_name.split(
+                            " ",
+                          )[0]}{" "}
+                          {review.reviewer_name
+                            .split(" ")
+                            .slice(-1)[0]
+                            .charAt(0)}
+                          .
                         </span>
 
                         <span>•</span>
@@ -905,11 +817,31 @@ export default async function PublicProfilePage({
                       key={project.id}
                       className="overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]"
                     >
-                      {project.imageUrl ? (
+                      {project.imageUrl2 ? (
+                        <div className="grid grid-cols-2">
+                          <div
+                            role="img"
+                            aria-label={`${project.title} project picture 1`}
+                            className="aspect-[4/3] bg-[#e9e1d2] bg-cover bg-center"
+                            style={{
+                              backgroundImage: `url(${project.imageUrl})`,
+                            }}
+                          />
+
+                          <div
+                            role="img"
+                            aria-label={`${project.title} project picture 2`}
+                            className="aspect-[4/3] border-l border-[#173d32]/10 bg-[#e9e1d2] bg-cover bg-center"
+                            style={{
+                              backgroundImage: `url(${project.imageUrl2})`,
+                            }}
+                          />
+                        </div>
+                      ) : project.imageUrl ? (
                         <div
                           role="img"
                           aria-label={`${project.title} project picture`}
-                          className="aspect-[4/3] bg-[#e9e1d2] bg-cover bg-center"
+                          className="aspect-[4/3] w-full bg-[#e9e1d2] bg-cover bg-center"
                           style={{
                             backgroundImage: `url(${project.imageUrl})`,
                           }}
@@ -934,15 +866,35 @@ export default async function PublicProfilePage({
                         )}
 
                         {isOwnProfile && (
-                          <FeatureProjectButton
-                            projectId={
-                              project.id
-                            }
-                            isVip={isVip}
-                            isFeatured={featuredProjectIds.has(
-                              project.id,
-                            )}
-                          />
+                          <>
+                            <FeatureProjectButton
+                              projectId={
+                                project.id
+                              }
+                              isVip={isVip}
+                              isFeatured={featuredProjectIds.has(
+                                project.id,
+                              )}
+                            />
+
+                            <PortfolioProjectActions
+                              projectId={
+                                project.id
+                              }
+                              title={
+                                project.title
+                              }
+                              description={
+                                project.description
+                              }
+                              imagePath={
+                                project.image_path
+                              }
+                              imagePath2={
+                                project.image_path_2
+                              }
+                            />
+                          </>
                         )}
                       </div>
                     </article>

@@ -493,9 +493,9 @@ const latestRefundRequests =
   </div>
 
 <div className="mt-7 grid gap-5 lg:grid-cols-3">
-  {/* ACCOUNT CHANGES */}
+  {}
   <section className="flex h-[190px] flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
-    {/* CARD TITLE */}
+    {}
     <div className="flex shrink-0 items-center justify-between px-7 pb-3 pt-6">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#173d32]/45">
         Account Changes
@@ -509,9 +509,9 @@ const latestRefundRequests =
       </Link>
     </div>
 
-    {/* CARD BODY */}
+    {}
     <div className="grid min-h-0 flex-1 grid-cols-[170px_minmax(0,1fr)]">
-      {/* COUNT */}
+      {}
       <div className="flex flex-col justify-center px-7">
         <p className="font-serif text-3xl text-[#b76449]">
           {pendingAccountChanges.length}
@@ -524,7 +524,7 @@ const latestRefundRequests =
         </p>
       </div>
 
-      {/* REQUEST LIST */}
+      {}
       <div className="min-h-0 overflow-y-auto border-l border-[#173d32]/5">
         {sortedPendingAccountChanges.length === 0 ? (
           <div className="flex h-full items-center justify-center px-6">
@@ -561,10 +561,10 @@ const latestRefundRequests =
                 key={request.id}
                 className="group border-b border-[#173d32]/10 last:border-b-0"
               >
-                {/* PREVIEW ROW */}
+                {}
                 <summary className="cursor-pointer list-none px-5 py-4 transition hover:bg-[#173d32]/[0.025]">
                   <div className="flex items-center justify-between gap-5">
-                    {/* USER */}
+                    {}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate font-semibold text-[#173d32]">
@@ -609,7 +609,7 @@ const latestRefundRequests =
                       </p>
                     </div>
 
-                    {/* REQUEST TYPE */}
+                    {}
                     <div className="flex shrink-0 items-center gap-4">
                       <span className="rounded-full bg-[#b76449]/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[#b76449]">
                         {request.request_type === "email"
@@ -624,7 +624,7 @@ const latestRefundRequests =
                   </div>
                 </summary>
 
-                {/* CLICKED / EXPANDED */}
+                {}
                 <div className="border-t border-[#173d32]/10 bg-[#f5f0e6]/70 px-5 py-5">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
@@ -691,7 +691,7 @@ const latestRefundRequests =
     </div>
   </section>
 
-{/* HELP & FEEDBACK */}
+{}
 <section className="flex h-[190px] flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
   <div className="flex shrink-0 items-center justify-between px-7 pb-3 pt-6">
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#173d32]/45">
@@ -783,7 +783,7 @@ const latestRefundRequests =
   </div>
 </section>
 
-{/* REFUNDS */}
+{}
 <section className="flex h-[190px] flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
   <div className="flex shrink-0 items-center justify-between px-7 pb-3 pt-6">
     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#173d32]/45">

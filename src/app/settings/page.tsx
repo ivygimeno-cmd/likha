@@ -16,7 +16,7 @@ const { user, profile } = currentUser;
 
   return (
     <main className="min-h-screen bg-[#f5f0e6] text-[#173d32]">
-      {/* HEADER */}
+      {}
       <header className="border-b border-[#173d32]/10 px-6 py-6 sm:px-10">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link
@@ -36,7 +36,7 @@ const { user, profile } = currentUser;
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 lg:py-20">
-        {/* PAGE TITLE */}
+        {}
         <div className="max-w-3xl">
         
 
@@ -49,9 +49,9 @@ const { user, profile } = currentUser;
           </p>
         </div>
 
-        {/* SETTINGS */}
+        {}
         <div className="mt-14 grid gap-6 lg:grid-cols-2">
-          {/* ACCOUNT */}
+          {}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
           
 
@@ -117,7 +117,7 @@ const { user, profile } = currentUser;
             </div>
           </section>
 
-          {/* SECURITY */}
+          {}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
           
 
@@ -149,7 +149,7 @@ const { user, profile } = currentUser;
             </div>
           </section>
 
-          {/* NOTIFICATIONS */}
+          {}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
         
 
@@ -181,7 +181,7 @@ const { user, profile } = currentUser;
             </div>
           </section>
 
-          {/* ACCOUNT ACCESS */}
+          {}
           <section className="rounded-[22px] border border-[#173d32]/15 bg-[#fbf8f1] p-7 sm:p-9">
        
 

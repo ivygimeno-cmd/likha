@@ -288,7 +288,7 @@ export default function VipSupportChat({
             }
             className="fixed bottom-6 right-6 z-[60] flex h-[520px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl"
           >
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
               <div>
                 <p className="font-semibold">
@@ -310,7 +310,7 @@ export default function VipSupportChat({
             </div>
 
             {!isVip ? (
-              /* Non-VIP */
+              
               <div className="flex flex-1 flex-col items-center justify-center px-7 text-center">
                 <p className="font-serif text-2xl font-semibold">
                   Priority Support
@@ -334,7 +334,7 @@ export default function VipSupportChat({
               </div>
             ) : (
               <>
-                {/* Messages */}
+                {}
                 <div className="flex-1 overflow-y-auto bg-[#f7f2e9] px-4 py-5">
                   {loadingMessages ? (
                     <div className="flex h-full items-center justify-center">
@@ -420,7 +420,7 @@ export default function VipSupportChat({
                   )}
                 </div>
 
-                {/* Message input */}
+                {}
                 <div className="border-t border-[#173d32]/10 bg-[#fbf8f1] p-3">
                   <div className="flex items-end gap-2">
                     <textarea

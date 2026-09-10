@@ -6,7 +6,6 @@ import Link from "next/link";
 function BotanicalLeaves() {
   return (
     <>
-      {/* Top-right botanical leaves */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute right-0 top-0 hidden overflow-hidden lg:block"
@@ -74,7 +73,6 @@ function BotanicalLeaves() {
         </svg>
       </div>
 
-      {/* Bottom-left botanical leaves */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute bottom-0 left-0 overflow-hidden"
@@ -187,15 +185,10 @@ export default function VipPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f5f0e6] text-[#173d32]">
-
       <BotanicalLeaves />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 py-14 lg:px-10 lg:py-20">
-
-        {/* Header */}
         <div className="max-w-3xl">
-
-
           <h1 className="mt-4 max-w-2xl font-serif text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
             Mas maraming pagkakataon para
             makita ang iyong gawa.
@@ -207,18 +200,11 @@ export default function VipPage() {
             at makakuha ng priority support
             bilang LIKHA VIP member.
           </p>
-
         </div>
 
-        {/* Main content */}
         <div className="mt-14 grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-20">
-
-          {/* Offer */}
           <section className="relative border-t border-[#173d32]/15 pt-7">
-
-            {/* Promotion */}
             <div className="flex flex-wrap items-center gap-4">
-
               <p className="font-serif text-2xl font-semibold sm:text-3xl">
                 First-time VIP
               </p>
@@ -226,12 +212,9 @@ export default function VipPage() {
               <span className="rounded-full bg-[#b76449] px-5 py-2.5 text-base font-bold text-white shadow-sm sm:text-lg">
                 25% OFF
               </span>
-
             </div>
 
-            {/* Price */}
             <div className="mt-8 flex items-end gap-4">
-
               <span className="font-serif text-7xl font-semibold leading-none sm:text-8xl">
                 ₱150
               </span>
@@ -241,7 +224,6 @@ export default function VipPage() {
                 <br />
                 30 araw
               </span>
-
             </div>
 
             <p className="mt-5 max-w-lg text-sm leading-7 text-[#173d32]/60">
@@ -251,15 +233,12 @@ export default function VipPage() {
               ang iyong babayaran.
             </p>
 
-            {/* First-time credit */}
             <div className="mt-9 rounded-2xl border border-[#173d32]/10 bg-white/35 px-6 py-6">
-
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b76449]">
                 Kasama sa unang VIP membership
               </p>
 
               <div className="mt-3 flex items-baseline gap-3">
-
                 <span className="font-serif text-5xl font-semibold text-[#b76449]">
                   50
                 </span>
@@ -267,7 +246,6 @@ export default function VipPage() {
                 <span className="text-sm text-[#173d32]/60">
                   LIKHA Credits
                 </span>
-
               </div>
 
               <p className="mt-2 max-w-md text-sm leading-6 text-[#173d32]/55">
@@ -276,7 +254,6 @@ export default function VipPage() {
                 one-time bonus sa unang pag-join
                 mo sa VIP.
               </p>
-
             </div>
 
             {errorMessage && (
@@ -285,7 +262,6 @@ export default function VipPage() {
               </div>
             )}
 
-            {/* CTA */}
             <button
               type="button"
               onClick={handleUpgrade}
@@ -297,40 +273,35 @@ export default function VipPage() {
                 : "Mag-join sa VIP sa ₱150"}
             </button>
 
-        <p className="mt-4 max-w-md text-xs leading-5 text-[#173d32]/45">
-  One-time payment. Walang automatic
-  na recurring charge.
-</p>
+            <p className="mt-4 max-w-md text-xs leading-5 text-[#173d32]/45">
+              One-time payment. Walang automatic
+              na recurring charge.
+            </p>
 
-<Link
-  href="/dashboard"
-  className="mt-5 inline-flex min-w-[150px] justify-center rounded-lg border border-[#b76449]/20 bg-[#b76449]/5 px-5 py-2.5 text-sm font-medium text-[#b76449]/80 transition hover:bg-[#b76449]/10 hover:text-[#b76449]"
->
-  Mamaya na
-</Link>
-
+            <Link
+              href="/dashboard"
+              className="mt-5 inline-flex min-w-[150px] justify-center rounded-lg border border-[#b76449]/20 bg-[#b76449]/5 px-5 py-2.5 text-sm font-medium text-[#b76449]/80 transition hover:bg-[#b76449]/10 hover:text-[#b76449]"
+            >
+              Mamaya na
+            </Link>
           </section>
 
-          {/* Benefits */}
           <section className="border-t border-[#173d32]/15 pt-7">
-
-
             <h2 className="mt-4 max-w-lg font-serif text-3xl leading-tight sm:text-4xl">
               Mas maraming paraan para
               mapansin ang iyong gawa.
             </h2>
 
             <div className="mt-8 divide-y divide-[#173d32]/10 border-y border-[#173d32]/10">
-
               <div className="py-5">
                 <p className="font-semibold">
                   I-feature ang iyong portfolio
                 </p>
 
                 <p className="mt-1 text-sm leading-6 text-[#173d32]/55">
-                  Mas mapansin ang iyong mga
-                  napiling proyekto sa loob
-                  ng LIKHA community.
+                  Pumili ng hanggang 3 portfolio
+                  projects na gusto mong i-highlight
+                  sa iyong profile.
                 </p>
               </div>
 
@@ -388,16 +359,13 @@ export default function VipPage() {
 
                 <p className="mt-1 text-sm leading-6 text-[#173d32]/55">
                   Ang iyong mga napiling proyekto
-                  ay maaaring magkaroon ng
-                  pagkakataong ma-feature sa LIKHA.
+                  ay maaaring mapili para sa special
+                  features sa LIKHA.
                 </p>
               </div>
-
             </div>
 
-            {/* Renewal */}
             <div className="mt-8">
-
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b76449]">
                 Pagkatapos ng unang 30 araw
               </p>
@@ -410,14 +378,9 @@ export default function VipPage() {
                 para ipagpatuloy ang iyong
                 VIP benefits.
               </p>
-
             </div>
-
           </section>
-
         </div>
-
-   
       </div>
     </main>
   );

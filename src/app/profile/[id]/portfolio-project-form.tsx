@@ -37,7 +37,10 @@ export default function PortfolioProjectForm() {
       formData.get("description") ?? "",
     ).trim();
 
-    const image = formData.get("image");
+    const imageFiles = formData.getAll("images").filter(
+      (value): value is File =>
+        value instanceof File && value.size > 0,
+    );
 
     setLoading(true);
     setMessage("");
@@ -59,22 +62,34 @@ export default function PortfolioProjectForm() {
       return;
     }
 
-    if (!(image instanceof File) || image.size === 0) {
-      setErrorMessage("Pumili ng project picture.");
+    if (imageFiles.length === 0) {
+      setErrorMessage("Pumili ng kahit isang project picture.");
       setLoading(false);
       return;
     }
 
-    if (!allowedFileTypes.includes(image.type)) {
-      setErrorMessage("JPEG, PNG, o WebP image lamang.");
+    if (imageFiles.length > 2) {
+      setErrorMessage("Maximum na 2 pictures lang bawat project.");
       setLoading(false);
       return;
     }
 
-    if (image.size > MAX_FILE_SIZE) {
-      setErrorMessage("Maximum na 5 MB ang project picture.");
-      setLoading(false);
-      return;
+    for (const image of imageFiles) {
+      if (!allowedFileTypes.includes(image.type)) {
+        setErrorMessage(
+          "JPEG, PNG, o WebP images lamang.",
+        );
+        setLoading(false);
+        return;
+      }
+
+      if (image.size > MAX_FILE_SIZE) {
+        setErrorMessage(
+          "Maximum na 5 MB bawat picture.",
+        );
+        setLoading(false);
+        return;
+      }
     }
 
     const {
@@ -90,22 +105,34 @@ export default function PortfolioProjectForm() {
       return;
     }
 
-    const extension = fileExtensions[image.type];
+    const uploadedPaths: string[] = [];
 
-    const imagePath =
-      `${user.id}/${crypto.randomUUID()}.${extension}`;
+    for (const image of imageFiles) {
+      const extension = fileExtensions[image.type];
 
-    const { error: uploadError } = await supabase.storage
-      .from("portfolio-images")
-      .upload(imagePath, image, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+      const imagePath =
+        `${user.id}/${crypto.randomUUID()}.${extension}`;
 
-    if (uploadError) {
-      setErrorMessage(uploadError.message);
-      setLoading(false);
-      return;
+      const { error: uploadError } = await supabase.storage
+        .from("portfolio-images")
+        .upload(imagePath, image, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        if (uploadedPaths.length > 0) {
+          await supabase.storage
+            .from("portfolio-images")
+            .remove(uploadedPaths);
+        }
+
+        setErrorMessage(uploadError.message);
+        setLoading(false);
+        return;
+      }
+
+      uploadedPaths.push(imagePath);
     }
 
     const { error: projectError } = await supabase
@@ -114,13 +141,14 @@ export default function PortfolioProjectForm() {
         owner_id: user.id,
         title,
         description,
-        image_path: imagePath,
+        image_path: uploadedPaths[0],
+        image_path_2: uploadedPaths[1] ?? null,
       });
 
     if (projectError) {
       await supabase.storage
         .from("portfolio-images")
-        .remove([imagePath]);
+        .remove(uploadedPaths);
 
       const reachedMaximum = projectError.message.includes(
         "Maximum of 6 portfolio projects allowed",
@@ -171,23 +199,24 @@ export default function PortfolioProjectForm() {
 
       <div>
         <label
-          htmlFor="portfolio-image"
+          htmlFor="portfolio-images"
           className="mb-2 block text-sm font-semibold"
         >
-          Project picture
+          Project pictures
         </label>
 
         <input
-          id="portfolio-image"
-          name="image"
+          id="portfolio-images"
+          name="images"
           type="file"
           required
+          multiple
           accept="image/jpeg,image/png,image/webp"
           className="w-full rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#173d32] file:px-4 file:py-2 file:font-semibold file:text-white"
         />
 
         <p className="mt-2 text-xs text-[#173d32]/55">
-          JPEG, PNG, o WebP. Maximum 5 MB.
+          JPEG, PNG, o WebP. Maximum 2 pictures, 5 MB bawat picture.
         </p>
       </div>
 
@@ -228,7 +257,7 @@ export default function PortfolioProjectForm() {
       >
         {loading
           ? "Ina-upload..."
-          : "Idagdag ang Project "}
+          : "Idagdag ang Project"}
       </button>
     </form>
   );

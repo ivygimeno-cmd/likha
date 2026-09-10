@@ -608,10 +608,10 @@ async function revokeAllUserSessions() {
 
 <div className="mx-auto grid max-w-7xl gap-5 px-6 py-8 lg:grid-cols-[30%_minmax(0,70%)] lg:px-10">
 
-{/* ACCOUNT CARD */}
+{}
 <section className="rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] p-6 lg:col-span-2">
   <div className="grid gap-7 lg:grid-cols-[220px_220px_minmax(160px,1fr)_300px] lg:items-start">
-    {/* USER INFO */}
+    {}
  <div>
   <div className="flex items-start gap-4">
       <div
@@ -691,7 +691,7 @@ async function revokeAllUserSessions() {
       </div>
     </div>
 
-    {/* EDIT CONTROLS */}
+    {}
     <div className="space-y-3">
       <details className="rounded-xl border border-[#173d32]/10 bg-[#f5f0e6] p-4">
         <summary className="cursor-pointer list-none text-sm font-semibold text-[#b76449]">
@@ -847,7 +847,7 @@ async function revokeAllUserSessions() {
       </details>
     </div>
 
-{/* SECURITY ACTIVITY */}
+{}
 <div className="hidden min-w-0 lg:block">
   <div className="overflow-hidden rounded-xl border border-[#173d32]/10 bg-[#f5f0e6]">
     <div className="border-b border-[#173d32]/10 px-4 py-3">
@@ -965,7 +965,7 @@ async function revokeAllUserSessions() {
   </div>
 </div>
 
-    {/* STATUS + MODERATION CONTROLS */}
+    {}
     <div>
       <div className="grid grid-cols-2 gap-x-6 gap-y-5 text-sm">
         <div>
@@ -1078,10 +1078,10 @@ async function revokeAllUserSessions() {
   </div>
 </section>
 
-  {/* LEFT COLUMN */}
+  {}
   <aside className="space-y-5">
 
-    {/* BLOCKED CHATS / MODERATION EVENTS */}
+    {}
     <section className="overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
       <div className="flex items-center justify-between border-b border-[#173d32]/10 px-5 py-4">
         <div>
@@ -1163,7 +1163,7 @@ async function revokeAllUserSessions() {
     </section>
   </aside>
 
-  {/* RIGHT COLUMN — CONVERSATION */}
+  {}
   <section className="flex h-[calc(100vh-150px)] min-h-[600px] flex-col overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
     <div className="shrink-0 border-b border-[#173d32]/10 px-6 py-5">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#b76449]">
@@ -1181,7 +1181,7 @@ async function revokeAllUserSessions() {
       </div>
     </div>
 
-    {/* THIS PART SCROLLS */}
+    {}
     <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6">
       {investigation.messages.length === 0 ? (
         <div className="flex h-full items-center justify-center text-center">
@@ -1267,7 +1267,7 @@ async function revokeAllUserSessions() {
     </div>
   </section>
 
-  {/* SUPPORT TICKETS — FULL WIDTH BELOW */}
+  {}
   <section className="lg:col-span-2">
     <div className="overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]">
       <div className="flex items-center justify-between border-b border-[#173d32]/10 px-6 py-5">

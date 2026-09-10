@@ -26,7 +26,7 @@ export default function SupportChat({
 
       {open && (
         <>
-          {/* Click outside to close */}
+          {}
           <button
             type="button"
             aria-label="Isara ang support chat"
@@ -34,9 +34,9 @@ export default function SupportChat({
             className="fixed inset-0 z-[59] cursor-default bg-transparent"
           />
 
-          {/* Chat panel */}
+          {}
           <div className="fixed bottom-6 right-6 z-[60] w-[calc(100vw-2rem)] max-w-sm overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-2xl">
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between bg-[#173d32] px-5 py-4 text-white">
               <div>
                 <p className="font-semibold">
@@ -60,7 +60,7 @@ export default function SupportChat({
               </button>
             </div>
 
-            {/* Content */}
+            {}
             <div className="p-5">
               {isVip ? (
                 <>

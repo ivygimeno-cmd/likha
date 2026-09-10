@@ -197,7 +197,7 @@ const { data: notificationsData } =
 
         <div className="flex items-center gap-2 sm:gap-3">
 
-          {/* Messages */}
+          {}
           <Link
             href="/messages"
             aria-label="Messages"
@@ -226,7 +226,7 @@ const { data: notificationsData } =
             </svg>
           </Link>
 
-          {/* Notifications */}
+          {}
           <NotificationDropdown>
             <summary
               aria-label="Notifications"
@@ -263,7 +263,7 @@ const { data: notificationsData } =
 
             <div className="absolute right-0 z-50 mt-3 w-[360px] overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-xl">
 
-              {/* Header */}
+              {}
               <div className="border-b border-[#173d32]/10 px-5 py-4">
                 <p className="font-semibold">
                   Notifications
@@ -274,7 +274,7 @@ const { data: notificationsData } =
                 </p>
               </div>
 
-              {/* Notification items */}
+              {}
               {notifications.length === 0 ? (
                 <div className="px-5 py-8 text-center">
                   <p className="text-sm text-[#173d32]/50">
@@ -296,7 +296,7 @@ const { data: notificationsData } =
                         <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#b76449]" />
                       )}
 
-                      {/* Click notification body */}
+                      {}
                       <form
                         action={openNotification}
                         className="min-w-0 flex-1"
@@ -342,7 +342,7 @@ const { data: notificationsData } =
                         </button>
                       </form>
 
-                      {/* Dismiss notification */}
+                      {}
                       <form action={dismissNotification}>
                         <input
                           type="hidden"
@@ -364,7 +364,7 @@ const { data: notificationsData } =
                 </div>
               )}
 
-              {/* Footer */}
+              {}
               <div className="p-3">
                 <Link
                   href="/notifications"
@@ -376,7 +376,7 @@ const { data: notificationsData } =
             </div>
           </NotificationDropdown>
 
-          {/* Profile dropdown */}
+          {}
           <ProfileDropdown>
             <summary className="flex cursor-pointer list-none items-center gap-3 rounded-full border border-[#173d32]/15 bg-[#fbf8f1] py-1.5 pr-4 pl-1.5 transition hover:border-[#173d32]/30">
               <div
@@ -421,7 +421,7 @@ const { data: notificationsData } =
 
             <div className="absolute right-0 z-50 mt-3 w-72 overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1] shadow-xl">
 
-              {/* Profile header */}
+              {}
               <div className="border-b border-[#173d32]/10 px-5 py-4">
                 <p className="truncate font-semibold">
                   {displayName}
@@ -447,7 +447,7 @@ const { data: notificationsData } =
 </p>
               </div>
 
-              {/* Menu */}
+              {}
               <div className="flex flex-col p-2">
 
                 <Link
