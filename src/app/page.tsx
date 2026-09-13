@@ -52,7 +52,7 @@ export default async function Home() {
   href="#how-it-works"
   className="hover:text-[#b76449]"
 >
-  Paano Gumagana
+  How it Works
 </a>
       </div>
 
@@ -70,17 +70,18 @@ export default async function Home() {
         <div>
        
 
-          <h1 className="max-w-3xl font-serif text-6xl leading-[0.98] font-semibold tracking-tight sm:text-7xl lg:text-[86px]">
-            May naiisip ka?
+          <h2 className="max-w-3xl font-serif text-6xl leading-[0.98] font-semibold tracking-tight sm:text-7xl lg:text-[86px]">
+            May project idea ka? <br></br>
+Kulang sa oras?
             <span className="block italic text-[#b76449]">
-              Ipagawa mo.
+              I-LIKHA mo na ’yan!
             </span>
-          </h1>
+          </h2>
 
   <p className="mt-8 max-w-2xl text-lg leading-8 text-[#173d32]/75">
-            Ikuwento ang gusto mong produkto at makipag-ugnayan sa mga lokal na
-            creator na kayang gumawa nito—mula custom apparel hanggang
-            personalized gifts at business packaging.
+         Share your vision with us, and we’ll connect you with skilled local creators who get
+the job done right. Whether it's custom apparel, personalized gifts, branded
+packaging and other freelance services, kami ang bahala!
           </p>
 
         
@@ -106,14 +107,14 @@ export default async function Home() {
           
 
             <h2 className="mt-5 max-w-md font-serif text-4xl leading-tight font-semibold sm:text-5xl">
-              Isang request. Maraming pwedeng gawin.
+             One project request, lots of options
             </h2>
 
             <div className="mt-12 space-y-4">
               {[
-                "Ilarawan ang gusto mong ipagawa",
-                "Tumanggap ng proposals mula sa creators",
-                "Piliin ang alok na swak sa iyo",
+                " Describe what you need",
+                "Wait for proposals from local creators",
+                "Select the proposal that fits your requirement",
               ].map((step, index) => (
                 <div
                   key={step}
@@ -132,10 +133,11 @@ export default async function Home() {
                 Sample request
               </p>
               <p className="mt-2 font-serif text-xl font-semibold">
-                “Kailangan ko ng 50 custom shirts para sa company event.”
+                "I need 50 custom shirts for a company event."
               </p>
               <p className="mt-3 text-sm text-[#173d32]/65">
-                Budget: ₱8,000–₱12,000 · Needed in 3 weeks
+      
+Budget: ₱8,000–₱12,000 · Timeframe: within 3 weeks
               </p>
             </div>
           </div>
@@ -150,7 +152,7 @@ export default async function Home() {
             <div>
             
               <h2 className="mt-3 font-serif text-4xl font-semibold sm:text-5xl">
-                Ano ang gusto mong ipagawa?
+          Anong gusto mong I-LIKHA?
               </h2>
             </div>
 
@@ -178,7 +180,7 @@ export default async function Home() {
   href={category.href}
   className="mt-6 inline-block font-semibold text-[#b76449] hover:text-[#9f503c]"
 >
-  Explore 
+Go to Marketplace
 </Link>
               </article>
             ))}
@@ -196,15 +198,15 @@ export default async function Home() {
        
 
               <h2 className="mt-4 max-w-2xl font-serif text-5xl leading-tight font-semibold sm:text-6xl">
-                Mula idea hanggang
+                Mula idea hanggang finished product.
                 <span className="block italic text-[#d27a5c]">
-                  finished product.
+                   LIKHA has you covered!
                 </span>
               </h2>
             </div>
 
             <p className="max-w-2xl text-lg leading-8 text-white/65 lg:justify-self-end">
-              I-post ang gusto mong ipagawa, ikumpara ang proposals ng local
+              I-post ang gusto mong ipagawa, tignan ang proposals ng local
               creators, at pamahalaan ang buong project sa loob ng LIKHA.
             </p>
           </div>
@@ -213,27 +215,27 @@ export default async function Home() {
             {[
               {
                 number: "01",
-                title: "I-post ang request",
+                title: "Post your request",
                 description:
-                  "Ilarawan ang produkto, budget, quantity, location, at deadline na kailangan mo.",
+                  "Provide project details: product type, budget, quantity, at target deadline.",
               },
               {
                 number: "02",
-                title: "Tumanggap ng proposals",
+                title: "Accept proposals",
                 description:
-                  "Makakatanggap ka ng presyo, delivery time, at proposal mula sa interested creators.",
+                  "Compare offers, service fee and turn-around time submitted by local creators.",
               },
               {
                 number: "03",
-                title: "Piliin ang creator",
+                title: "Choose your local creator",
                 description:
-                  "Tingnan ang profile, ratings, at reviews bago tanggapin ang proposal na swak sa iyo.",
+                  "Review profiles, ratings, and past work before picking your preferred partner.",
               },
               {
                 number: "04",
-                title: "Tapusin ang order",
+                title: "Manage your order",
                 description:
-                  "Mag-usap sa LIKHA inbox, i-review ang submitted work, at mag-iwan ng rating pagkatapos.",
+                  "Monitor your projects, approve submitted work, and leave a review to celebrate great work using your LIKHA dashboard.",
               },
             ].map((step, index) => (
               <article

@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const REQUEST_TIMEOUT_MS = 30 * 1000;
 
 const allowedFileTypes = [
   "image/jpeg",
@@ -24,6 +25,11 @@ type ProjectActionsProps = {
   description: string;
   imagePath: string | null;
   imagePath2: string | null;
+};
+
+type UploadResult = {
+  path: string;
+  error: Error | null;
 };
 
 export default function PortfolioProjectActions({
@@ -46,6 +52,8 @@ export default function PortfolioProjectActions({
   const [editDescription, setEditDescription] =
     useState(description);
 
+  const operationRef = useRef(0);
+
   const imageUrl = imagePath
     ? supabase.storage
         .from("portfolio-images")
@@ -60,7 +68,17 @@ export default function PortfolioProjectActions({
         .data.publicUrl
     : null;
 
+  function beginOperation() {
+    operationRef.current += 1;
+    return operationRef.current;
+  }
+
+  function isOperationActive(operationId: number) {
+    return operationRef.current === operationId;
+  }
+
   function openEdit() {
+    beginOperation();
     setEditTitle(title);
     setEditDescription(description);
     setMessage("");
@@ -69,9 +87,9 @@ export default function PortfolioProjectActions({
   }
 
   function closeEdit() {
-    if (loading) return;
-
+    beginOperation();
     setEditing(false);
+    setLoading(false);
     setMessage("");
     setErrorMessage("");
     setEditTitle(title);
@@ -91,283 +109,536 @@ export default function PortfolioProjectActions({
     setErrorMessage("");
   }
 
+  async function withTimeout<T>(
+    promise: PromiseLike<T>,
+    message: string,
+  ): Promise<T> {
+    let timeoutId: ReturnType<typeof setTimeout> | null =
+      null;
+
+    const timeoutPromise = new Promise<never>(
+      (_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(new Error(message));
+        }, REQUEST_TIMEOUT_MS);
+      },
+    );
+
+    try {
+      return await Promise.race([
+        promise,
+        timeoutPromise,
+      ]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
+  }
+
+  async function uploadImage(
+    image: File,
+    userId: string,
+    operationId: number,
+  ): Promise<UploadResult> {
+    const extension = fileExtensions[image.type];
+
+    const newImagePath =
+      `${userId}/${crypto.randomUUID()}.${extension}`;
+
+    try {
+      const uploadPromise = supabase.storage
+        .from("portfolio-images")
+        .upload(
+          newImagePath,
+          image,
+          {
+            cacheControl: "3600",
+            upsert: false,
+          },
+        );
+
+      const result = await withTimeout(
+        uploadPromise,
+        "Image upload timed out. Check your internet connection and try again.",
+      );
+
+      if (
+        !isOperationActive(operationId)
+      ) {
+        await supabase.storage
+          .from("portfolio-images")
+          .remove([newImagePath]);
+
+        return {
+          path: newImagePath,
+          error: new Error("Upload cancelled."),
+        };
+      }
+
+      if (result.error) {
+        return {
+          path: newImagePath,
+          error:
+            result.error instanceof Error
+              ? result.error
+              : new Error(
+                  String(result.error),
+                ),
+        };
+      }
+
+      return {
+        path: newImagePath,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        path: newImagePath,
+        error:
+          error instanceof Error
+            ? error
+            : new Error(String(error)),
+      };
+    }
+  }
+
   async function handleUpdate(
     event: FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
+    const form = event.currentTarget;
+    const operationId = beginOperation();
+
     setLoading(true);
     setMessage("");
     setErrorMessage("");
 
-    const nextTitle = editTitle.trim();
-    const nextDescription = editDescription.trim();
+    try {
+      const nextTitle = editTitle.trim();
+      const nextDescription =
+        editDescription.trim();
 
-    if (nextTitle.length < 2 || nextTitle.length > 100) {
-      setErrorMessage(
-        "Ang project title ay dapat 2 hanggang 100 characters.",
-      );
-      setLoading(false);
-      return;
-    }
-
-    if (nextDescription.length > 1000) {
-      setErrorMessage(
-        "Maximum na 1,000 characters ang description.",
-      );
-      setLoading(false);
-      return;
-    }
-
-    const { data: userData, error: userError } =
-      await supabase.auth.getUser();
-
-    const user = userData.user;
-
-    if (userError || !user) {
-      setErrorMessage(
-        "Mag-sign in ulit bago mag-edit ng project.",
-      );
-      setLoading(false);
-      return;
-    }
-
-    const {
-      data: existingProject,
-      error: projectFetchError,
-    } = await supabase
-      .from("portfolio_projects")
-      .select(
-        "owner_id, image_path, image_path_2",
-      )
-      .eq("id", projectId)
-      .maybeSingle();
-
-    if (
-      projectFetchError ||
-      !existingProject ||
-      existingProject.owner_id !== user.id
-    ) {
-      setErrorMessage(
-        "Hindi ma-edit ang project na ito.",
-      );
-      setLoading(false);
-      return;
-    }
-
-    const formData = new FormData(
-      event.currentTarget,
-    );
-
-    const imageFiles = formData
-      .getAll("images")
-      .filter(
-        (value): value is File =>
-          value instanceof File &&
-          value.size > 0,
-      );
-
-    if (imageFiles.length > 2) {
-      setErrorMessage(
-        "Maximum na 2 pictures lang bawat project.",
-      );
-      setLoading(false);
-      return;
-    }
-
-    for (const image of imageFiles) {
-      if (!allowedFileTypes.includes(image.type)) {
+      if (
+        nextTitle.length < 2 ||
+        nextTitle.length > 100
+      ) {
         setErrorMessage(
-          "JPEG, PNG, o WebP images lamang.",
+          "Ang project title ay dapat 2 hanggang 100 characters.",
         );
-        setLoading(false);
         return;
       }
 
-      if (image.size > MAX_FILE_SIZE) {
+      if (nextDescription.length > 1000) {
         setErrorMessage(
-          "Maximum na 5 MB bawat picture.",
+          "Maximum na 1,000 characters ang description.",
         );
-        setLoading(false);
         return;
       }
-    }
 
-    const uploadedPaths: string[] = [];
+      const {
+        data: userData,
+        error: userError,
+      } = await withTimeout(
+        supabase.auth.getUser(),
+        "Hindi makakonekta sa authentication service. Please try again.",
+      );
 
-    for (const image of imageFiles) {
-      const extension = fileExtensions[image.type];
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
 
-      const newImagePath =
-        `${user.id}/${crypto.randomUUID()}.${extension}`;
+      const user = userData.user;
 
-      const { error: uploadError } =
-        await supabase.storage
-          .from("portfolio-images")
-          .upload(
-            newImagePath,
-            image,
-            {
-              cacheControl: "3600",
-              upsert: false,
-            },
+      if (userError || !user) {
+        setErrorMessage(
+          "Mag-sign in ulit bago mag-edit ng project.",
+        );
+        return;
+      }
+
+      const {
+        data: existingProject,
+        error: projectFetchError,
+      } = await withTimeout(
+        supabase
+          .from("portfolio_projects")
+          .select(
+            "owner_id, image_path, image_path_2",
+          )
+          .eq("id", projectId)
+          .maybeSingle(),
+        "Hindi makakonekta sa project database. Please try again.",
+      );
+
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
+
+      if (
+        projectFetchError ||
+        !existingProject ||
+        existingProject.owner_id !== user.id
+      ) {
+        setErrorMessage(
+          "Hindi ma-edit ang project na ito.",
+        );
+        return;
+      }
+
+      const input =
+        form.elements.namedItem("images");
+
+      if (!(input instanceof HTMLInputElement)) {
+        setErrorMessage(
+          "Hindi makita ang image upload field.",
+        );
+        return;
+      }
+
+      const imageFiles = Array.from(
+        input.files ?? [],
+      ).filter((file) => file.size > 0);
+
+      if (imageFiles.length > 2) {
+        setErrorMessage(
+          "Maximum na 2 pictures lang bawat project.",
+        );
+        return;
+      }
+
+      for (const image of imageFiles) {
+        if (
+          !allowedFileTypes.includes(
+            image.type,
+          )
+        ) {
+          setErrorMessage(
+            "JPEG, PNG, o WebP images lamang.",
           );
+          return;
+        }
 
-      if (uploadError) {
+        if (image.size > MAX_FILE_SIZE) {
+          setErrorMessage(
+            "Maximum na 5 MB bawat picture.",
+          );
+          return;
+        }
+      }
+
+     const uploadResults =
+  imageFiles.length > 0
+    ? await Promise.all(
+        imageFiles.map((file) =>
+          withTimeout(
+            uploadImage(
+  file,
+  user.id,
+  operationId,
+),
+            "Nag-timeout ang image upload.",
+          ),
+        ),
+      )
+    : [];
+
+
+
+const uploadedPaths =
+  uploadResults
+    .filter((result) => !result.error)
+    .map((result) => result.path);
+
+if (imageFiles.length > 0 && uploadedPaths.length !== imageFiles.length) {
+  setErrorMessage(
+    "May image na hindi na-upload nang maayos. Please try again.",
+  );
+  return;
+}
+
+const nextImagePath =
+  uploadedPaths.length > 0
+    ? uploadedPaths[0]
+    : existingProject.image_path;
+
+const nextImagePath2 =
+  uploadedPaths.length > 1
+    ? uploadedPaths[1]
+    : existingProject.image_path_2;
+
+      if (
+        !isOperationActive(operationId)
+      ) {
         if (uploadedPaths.length > 0) {
           await supabase.storage
             .from("portfolio-images")
             .remove(uploadedPaths);
         }
 
-        setErrorMessage(uploadError.message);
-        setLoading(false);
         return;
       }
 
-      uploadedPaths.push(newImagePath);
-    }
+      const {
+        error: updateError,
+      } = await withTimeout(
+        supabase
+          .from("portfolio_projects")
+          .update({
+            title: nextTitle,
+            description: nextDescription,
+            image_path: nextImagePath,
+            image_path_2: nextImagePath2,
+          })
+          .eq("id", projectId)
+          .eq("owner_id", user.id),
+        "Hindi matapos ang database update. Please try again.",
+      );
 
-    const nextImagePath =
-      uploadedPaths[0] ??
-      existingProject.image_path ??
-      null;
-
-    const nextImagePath2 =
-      uploadedPaths.length > 1
-        ? uploadedPaths[1]
-        : existingProject.image_path_2;
-
-    const { error: updateError } =
-      await supabase
-        .from("portfolio_projects")
-        .update({
-          title: nextTitle,
-          description: nextDescription,
-          image_path: nextImagePath,
-          image_path_2: nextImagePath2,
-        })
-        .eq("id", projectId)
-        .eq("owner_id", user.id);
-
-    if (updateError) {
-      if (uploadedPaths.length > 0) {
-        await supabase.storage
-          .from("portfolio-images")
-          .remove(uploadedPaths);
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
       }
 
-      setErrorMessage(updateError.message);
+      if (updateError) {
+        if (uploadedPaths.length > 0) {
+          await supabase.storage
+            .from("portfolio-images")
+            .remove(uploadedPaths);
+        }
+
+        setErrorMessage(
+          updateError.message,
+        );
+        return;
+      }
+
+      const { data: savedProject, error: verifyError } =
+  await withTimeout(
+    supabase
+      .from("portfolio_projects")
+      .select("image_path, image_path_2")
+      .eq("id", projectId)
+      .maybeSingle(),
+    "Hindi ma-verify ang saved project.",
+  );
+
+if (
+  verifyError ||
+  !savedProject ||
+  savedProject.image_path !== nextImagePath ||
+  savedProject.image_path_2 !== nextImagePath2
+) {
+  setErrorMessage(
+    "Na-upload ang image pero hindi na-save nang tama ang second image sa database.",
+  );
+  return;
+}
+
+      const oldPathsToRemove: string[] =
+        [];
+
+      if (
+        uploadedPaths[0] &&
+        existingProject.image_path &&
+        uploadedPaths[0] !==
+          existingProject.image_path
+      ) {
+        oldPathsToRemove.push(
+          existingProject.image_path,
+        );
+      }
+
+      if (
+        uploadedPaths[1] &&
+        existingProject.image_path_2 &&
+        uploadedPaths[1] !==
+          existingProject.image_path_2
+      ) {
+        oldPathsToRemove.push(
+          existingProject.image_path_2,
+        );
+      }
+
+      if (
+        oldPathsToRemove.length > 0
+      ) {
+        await withTimeout(
+          supabase.storage
+            .from("portfolio-images")
+            .remove(
+              oldPathsToRemove,
+            ),
+          "Na-update na ang project, pero hindi agad na-clean up ang dating larawan.",
+        ).catch(() => null);
+      }
+
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
+
+      setMessage(
+        "Na-update na ang project.",
+      );
       setLoading(false);
-      return;
-    }
+      setEditing(false);
+      router.refresh();
+    } catch (error) {
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
 
-    const oldPathsToRemove: string[] = [];
-
-    if (
-      uploadedPaths[0] &&
-      existingProject.image_path &&
-      uploadedPaths[0] !==
-        existingProject.image_path
-    ) {
-      oldPathsToRemove.push(
-        existingProject.image_path,
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "May unexpected error habang nagsa-save ng project.",
       );
+    } finally {
+      if (
+        isOperationActive(operationId)
+      ) {
+        setLoading(false);
+      }
     }
-
-    if (
-      uploadedPaths[1] &&
-      existingProject.image_path_2 &&
-      uploadedPaths[1] !==
-        existingProject.image_path_2
-    ) {
-      oldPathsToRemove.push(
-        existingProject.image_path_2,
-      );
-    }
-
-    if (oldPathsToRemove.length > 0) {
-      await supabase.storage
-        .from("portfolio-images")
-        .remove(oldPathsToRemove);
-    }
-
-    setMessage("Na-update na ang project.");
-    setLoading(false);
-    setEditing(false);
-    router.refresh();
   }
 
   async function handleDelete() {
+    const operationId = beginOperation();
+
     setLoading(true);
     setMessage("");
     setErrorMessage("");
 
-    const { data: userData, error: userError } =
-      await supabase.auth.getUser();
-
-    const user = userData.user;
-
-    if (userError || !user) {
-      setErrorMessage(
-        "Mag-sign in ulit bago mag-delete ng project.",
+    try {
+      const {
+        data: userData,
+        error: userError,
+      } = await withTimeout(
+        supabase.auth.getUser(),
+        "Hindi makakonekta sa authentication service. Please try again.",
       );
-      setLoading(false);
-      return;
-    }
 
-    const {
-      data: project,
-      error: projectError,
-    } = await supabase
-      .from("portfolio_projects")
-      .select(
-        "owner_id, image_path, image_path_2",
-      )
-      .eq("id", projectId)
-      .maybeSingle();
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
 
-    if (
-      projectError ||
-      !project ||
-      project.owner_id !== user.id
-    ) {
-      setErrorMessage(
-        "Hindi ma-delete ang project na ito.",
+      const user = userData.user;
+
+      if (userError || !user) {
+        setErrorMessage(
+          "Mag-sign in ulit bago mag-delete ng project.",
+        );
+        return;
+      }
+
+      const {
+        data: project,
+        error: projectError,
+      } = await withTimeout(
+        supabase
+          .from("portfolio_projects")
+          .select(
+            "owner_id, image_path, image_path_2",
+          )
+          .eq("id", projectId)
+          .maybeSingle(),
+        "Hindi makakonekta sa project database. Please try again.",
       );
+
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
+
+      if (
+        projectError ||
+        !project ||
+        project.owner_id !== user.id
+      ) {
+        setErrorMessage(
+          "Hindi ma-delete ang project na ito.",
+        );
+        return;
+      }
+
+      const {
+        error: deleteError,
+      } = await withTimeout(
+        supabase
+          .from("portfolio_projects")
+          .delete()
+          .eq("id", projectId)
+          .eq("owner_id", user.id),
+        "Hindi matapos ang delete operation. Please try again.",
+      );
+
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
+
+      if (deleteError) {
+        setErrorMessage(
+          deleteError.message,
+        );
+        return;
+      }
+
+      const pathsToRemove = [
+        project.image_path,
+        project.image_path_2,
+      ].filter(
+        (path): path is string =>
+          Boolean(path),
+      );
+
+      if (pathsToRemove.length > 0) {
+        await withTimeout(
+          supabase.storage
+            .from("portfolio-images")
+            .remove(
+              pathsToRemove,
+            ),
+          "Na-delete na ang project, pero hindi agad na-clean up ang larawan.",
+        ).catch(() => null);
+      }
+
+      setDeleting(false);
       setLoading(false);
-      return;
+      router.refresh();
+    } catch (error) {
+      if (
+        !isOperationActive(operationId)
+      ) {
+        return;
+      }
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "May unexpected error habang nagde-delete ng project.",
+      );
+    } finally {
+      if (
+        isOperationActive(operationId)
+      ) {
+        setLoading(false);
+      }
     }
-
-    const { error: deleteError } =
-      await supabase
-        .from("portfolio_projects")
-        .delete()
-        .eq("id", projectId)
-        .eq("owner_id", user.id);
-
-    if (deleteError) {
-      setErrorMessage(deleteError.message);
-      setLoading(false);
-      return;
-    }
-
-    const pathsToRemove = [
-      project.image_path,
-      project.image_path_2,
-    ].filter(
-      (path): path is string =>
-        Boolean(path),
-    );
-
-    if (pathsToRemove.length > 0) {
-      await supabase.storage
-        .from("portfolio-images")
-        .remove(pathsToRemove);
-    }
-
-    setDeleting(false);
-    router.refresh();
   }
 
   return (
@@ -428,18 +699,23 @@ export default function PortfolioProjectActions({
           </p>
         )}
 
-        {errorMessage && !editing && !deleting && (
-          <p className="text-sm text-red-700">
-            {errorMessage}
-          </p>
-        )}
+        {errorMessage &&
+          !editing &&
+          !deleting && (
+            <p className="text-sm text-red-700">
+              {errorMessage}
+            </p>
+          )}
       </div>
 
       {editing && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#173d32]/35 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
               closeEdit();
             }
           }}
@@ -453,9 +729,8 @@ export default function PortfolioProjectActions({
               <button
                 type="button"
                 onClick={closeEdit}
-                disabled={loading}
                 aria-label="Close"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-2xl leading-none text-[#173d32]/60 transition hover:bg-[#173d32]/8 hover:text-[#173d32] disabled:opacity-40"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-2xl leading-none text-[#173d32]/60 transition hover:bg-[#173d32]/8 hover:text-[#173d32]"
               >
                 ×
               </button>
@@ -485,7 +760,8 @@ export default function PortfolioProjectActions({
                   }
                   maxLength={100}
                   required
-                  className="w-full rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-[#173d32] outline-none focus:border-[#b76449]"
+                  disabled={loading}
+                  className="w-full rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-[#173d32] outline-none focus:border-[#b76449] disabled:opacity-60"
                 />
               </div>
 
@@ -543,7 +819,8 @@ export default function PortfolioProjectActions({
                   type="file"
                   multiple
                   accept="image/jpeg,image/png,image/webp"
-                  className="w-full rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#173d32] file:px-4 file:py-2 file:font-semibold file:text-white"
+                  disabled={loading}
+                  className="w-full rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#173d32] file:px-4 file:py-2 file:font-semibold file:text-white disabled:opacity-60"
                 />
 
                 <p className="mt-2 text-xs leading-5 text-[#173d32]/55">
@@ -573,7 +850,8 @@ export default function PortfolioProjectActions({
                   }
                   maxLength={1000}
                   rows={6}
-                  className="w-full resize-y rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-[#173d32] outline-none focus:border-[#b76449]"
+                  disabled={loading}
+                  className="w-full resize-y rounded-lg border border-[#173d32]/20 bg-white px-4 py-3 text-[#173d32] outline-none focus:border-[#b76449] disabled:opacity-60"
                 />
               </div>
 
@@ -587,8 +865,7 @@ export default function PortfolioProjectActions({
                 <button
                   type="button"
                   onClick={closeEdit}
-                  disabled={loading}
-                  className="rounded-lg border border-[#173d32]/20 px-5 py-3 text-sm font-semibold text-[#173d32] transition hover:border-[#173d32]/40 disabled:opacity-40"
+                  className="rounded-lg border border-[#173d32]/20 px-5 py-3 text-sm font-semibold text-[#173d32] transition hover:border-[#173d32]/40"
                 >
                   Cancel
                 </button>
@@ -612,7 +889,10 @@ export default function PortfolioProjectActions({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#173d32]/35 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
               closeDelete();
             }
           }}

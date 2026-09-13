@@ -8,6 +8,7 @@ import FollowButton from "./follow-button";
 import FeatureProjectButton from "@/app/components/feature-project-button";
 import ProjectDescription from "./project-description";
 import PortfolioProjectActions from "./portfolio-project-actions";
+import PortfolioProjectGallery from "./portfolio-project-gallery";
 
 type PageProps = {
   params: Promise<{
@@ -817,40 +818,12 @@ export default async function PublicProfilePage({
                       key={project.id}
                       className="overflow-hidden rounded-2xl border border-[#173d32]/15 bg-[#fbf8f1]"
                     >
-                      {project.imageUrl2 ? (
-                        <div className="grid grid-cols-2">
-                          <div
-                            role="img"
-                            aria-label={`${project.title} project picture 1`}
-                            className="aspect-[4/3] bg-[#e9e1d2] bg-cover bg-center"
-                            style={{
-                              backgroundImage: `url(${project.imageUrl})`,
-                            }}
-                          />
-
-                          <div
-                            role="img"
-                            aria-label={`${project.title} project picture 2`}
-                            className="aspect-[4/3] border-l border-[#173d32]/10 bg-[#e9e1d2] bg-cover bg-center"
-                            style={{
-                              backgroundImage: `url(${project.imageUrl2})`,
-                            }}
-                          />
-                        </div>
-                      ) : project.imageUrl ? (
-                        <div
-                          role="img"
-                          aria-label={`${project.title} project picture`}
-                          className="aspect-[4/3] w-full bg-[#e9e1d2] bg-cover bg-center"
-                          style={{
-                            backgroundImage: `url(${project.imageUrl})`,
-                          }}
-                        />
-                      ) : (
-                        <div className="flex aspect-[4/3] items-center justify-center bg-[#e9e1d2] text-sm text-[#173d32]/45">
-                          Walang larawan
-                        </div>
-                      )}
+               <PortfolioProjectGallery
+  title={project.title}
+  description={project.description}
+  imageUrl={project.imageUrl}
+  imageUrl2={project.imageUrl2}
+/>
 
                       <div className="p-5">
                         <h3 className="font-serif text-2xl font-semibold">
